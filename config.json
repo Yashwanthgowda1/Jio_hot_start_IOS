@@ -1,0 +1,153 @@
+{   "common_desired_caps" : {
+        "appActivity": "com.hotstar.MainActivity",
+        "appPackage": "in.startv.hotstar",
+        "automationName": "UiAutomator2",
+        "platformName": "android",
+        "deviceName": "Android",
+        "newCommandTimeout": 90000,
+        "optionalIntentArguments": "--esn automation"
+    },
+    "devices" : {
+        "device_1" : {
+            "oem": "-",
+            "model": "-",
+            "port": 5200,
+            "admin_username": "admin",
+            "admin_password" : "admin",
+            "firmware" : "1.0",
+            "desired_caps" : {
+                "alias": "app1",
+                "udid": "-"
+            },
+            "user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "port":"5300",
+                "privatelinenumber":"_",
+                "pstndisplay": "-",
+                "extension": "-"
+            } 
+        },
+        "device_2" : {
+            "oem": "-",
+            "model": "-",
+            "port": 5200,
+            "admin_username": "admin",
+            "admin_password" : "admin",
+            "firmware" : "1.0",
+            "desired_caps" : {
+                "alias": "app1",
+                "udid": "-"
+            },
+            "user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "pstndisplay": "-",
+                "extension": "-"
+            },
+            "pstn_user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "pstndisplay": "-",
+                "extension": "-"
+            },
+            "delegate_user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "pstndisplay": "-",
+                "extension": "-"
+            }
+        },
+        "device_3" : {
+            "oem": "-",
+            "model": "-",
+            "port": 5300,
+            "admin_username": "admin",
+            "admin_password" : "admin",
+            "firmware" : "1.0",
+            "desired_caps" : {
+                "alias": "app1",
+                "udid": "-"
+            },
+            "user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "pstndisplay": "-",
+                "extension": "-"
+            },
+            "pstn_user": {
+                "username": "-",
+                "password": "-",
+                "displayname": "-",
+                "phonenumber": "-",
+                "pstndisplay": "-",
+                "extension": "-"
+            }
+        }
+	},
+    "browsers": {
+        "tdc_1": {
+          "user": {
+            "username": "-",
+            "password": "-",
+            "displayname": "-",
+            "phonenumber": "-",
+            "pstndisplay": "-",
+            "extension": "-"
+            },
+          "device1user": {
+            "username": "-",
+            "password": "-",
+            "displayname": "-",
+            "phonenumber": "-",
+            "pstndisplay": "-",
+            "extension": "-"
+            },
+          "device2user": {
+            "username": "-",
+            "password": "-",
+            "displayname": "-",
+            "phonenumber": "-",
+            "pstndisplay": "-",
+            "extension": "-",
+            "rtt_text_data":"welcome to automation"
+          } 
+        }
+      },
+    "adb_disabled_device": {
+        "udid": "-"
+    },
+    "meetings" : {
+        "name": "test_meeting",
+        "participant": "-",
+        "location": "-"
+    },
+    "Report_feedback" : {
+        "title": "-",
+        "bug_details": "-"
+    },
+    "hot_desk" : {
+        "invalid_username" : "-"
+    },
+    "set_status_message" : {
+        "message" : "-"
+    },
+    "user" : {
+        "invalid_username" : "-",
+        "invalid_domain" : "-",
+        "invalid_password" : "-"
+    },
+	"incorrect_number": {
+        "phonenumber": "11234567890"
+    }
+}
