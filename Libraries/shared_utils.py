@@ -1,14 +1,23 @@
 import json
 import time
 import subprocess
+from robot.api import logger
+from appium.webdriver.common.appiumby import AppiumBy
+from selenium.webdriver.support.ui import WebDriverWait
+import device_manager
+from  selenium.webdriver.common.by import  By
+from  selenium.webdriver.support import  expected_conditions as EC
+from  selenium.common.exceptions import  NoSuchElementException, StaleElementReferenceException, ElementNotInteractableException, ElementNotVisibleException
+from error_handler_utils import auto_handle_appium_errors, for_each_device
+
 
 def _init_config(file_name: str):
     """
     Returns: parsed configuration object from "config.json"
     """
     return json.loads(open(file_name).read())
-
-config=_init_config("config.json")
+file_path="C:\\New folder\\JIO__hotstar_apllication\\Jio_hot_start_IOS\\config.json"
+config=_init_config(file_path)
 print(f"the config is loded crtly    {config}")
 
 
@@ -21,6 +30,7 @@ def getconfig_device_class(device_name):
         return "devices"
     if "browsers" in config and device_name in config["browsers"]:
         return "browsers"
+
 
 
 def sleep_with_msg(device, wait_seconds, why_message):
@@ -103,3 +113,90 @@ def get_top_level_device_port(device):
         raise ValueError(f"Top-level 'port' missing or invalid for '{device_name}'")
 
     return port
+
+def take_screenshot_on_error(device_name, message):
+    """Take screenshot for a specific device."""
+    driver=device_manager.get_driver(device_name)
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    screenshot_name = f"screenshot_{device_name}_{timestamp}.png"
+    screenshot_path = os.path.join(os.getcwd(), screenshot_name)
+
+    if driver:
+        driver.save_screenshot(screenshot_path)
+        logger.error(message)
+        logger.info(
+            f'<a href="{screenshot_name}"><img src="{screenshot_name}" width="800px"></a>',
+            html=True
+        )
+    else:
+        logger.error(f"Driver for {device_name} not initialized, cannot take screenshot.")
+
+
+@auto_handle_appium_errors()
+def find_element(devices,locator_dict, locator_key,  timeout=10 , single_elemnt=True):
+    devices=[]
+    if isinstance(devices, str):
+        devices=[devices]
+    for device in devices:
+        name_device=getconfig_device_class(device)
+        driver=device_manager.get_driver(device)
+        if name_device=="devices":   # it choice the appium
+            by_map = {
+
+                "xpath": AppiumBy.XPATH,
+                "id": AppiumBy.ACCESSIBILITY_ID,
+                "class_name": AppiumBy.CLASS_NAME,
+                "android_ui_automator": AppiumBy.ANDROID_UIAUTOMATOR
+            }
+        else:  # Web driver
+            by_map = {
+                "id": By.ID,
+                "xpath": By.XPATH,
+                "text": By.LINK_TEXT,
+            }
+        locator_all_keypairs = locator_dict[locator_key]
+        for loc_type, loc_value in locator_all_keypairs.items():
+            by = by_map.get(loc_type.lower())
+            if by and single_element:
+                try:
+                    return WebDriverWait(driver, timeout).until(
+                        EC.presence_of_element_located((by, loc_value))
+                    )
+                except Exception:
+                    take_screenshot_on_error(device, "failure because elemnt not found")
+                    continue
+            elif single_elemnt==False:
+                if by:
+                    try:
+                        return  WebDriverWait(driver, timeout).until(
+                        EC.presence_of_all_elements_located((by, loc_value)))
+                    except Exception as e:
+                        raise  print(f"the list weblemnts {e}")
+
+        take_screenshot_on_error(device, f"Element '{locator_key}' not found after {timeout}s")
+        raise Exception(f"Element '{locator_key}' not found")
+
+
+def find_elements(devices,locator_dict, locator_key,  timeout=10,single_elemnt=False):
+    return  find_element(devices,locator_dict,  locator_key,  timeout=10, single_elemnt=False)
+
+
+def load_loctors(file_path):
+    with open(file_path, "r", encoding="utf-8") as f:
+        return json.loads(f.read())
+
+def click_if_visible(devices, locator_dict, locator_key):
+    if isinstance(devices , str):
+        _devices=[devices]
+        for device in _devices:
+            try:
+                print("here trying to wrraping up the device findelemnt")
+                _element=find_element(devices, locator_dict, locator_key, timeout=10, single_elemnt=True)
+                if _element and _element.is_displayed():
+                    _element.click()
+                else:
+                    print(f"️ Element '{_element}' is not visible on {device}")
+            except ElementNotVisibleException as e:
+                raise  print(f" the click the visible of the elemnt {device} is  {e}")
+
+

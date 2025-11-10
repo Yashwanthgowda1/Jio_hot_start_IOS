@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from robot.libraries.BuiltIn import BuiltIn
 import os
 import subprocess
-import device_control
+from  Libraries import device_control
 import shared_utils
 import requests
 from selenium import webdriver as chrome_webdriver 
