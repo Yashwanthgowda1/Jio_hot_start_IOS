@@ -180,10 +180,6 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
             except Exception:
                 print(f"[{dev}] ❌ Locator failed: {locator_key} → trying next")
                 take_screenshot(driver, dev, f"{locator_key}_not_found")
-
-        # --------------------------------------
-        # 4️⃣ All locators failed → raise
-        # --------------------------------------
         raise Exception(f"[{dev}] ❌ Element '{locator_key}' NOT FOUND")
 
 
