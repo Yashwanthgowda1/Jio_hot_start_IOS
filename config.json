@@ -11,7 +11,7 @@
         "device_1" : {
             "oem": "-",
             "model": "-",
-            "port": 5200,
+            "port": 4723,
             "admin_username": "admin",
             "admin_password" : "admin",
             "firmware" : "1.0",

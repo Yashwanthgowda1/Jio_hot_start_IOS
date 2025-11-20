@@ -1,0 +1,23 @@
+{
+  "build_your_home_page": {
+    "id": "GRID_SELECTION_WIDGET_TEST_TAG_TITLE",
+    "Xpath": "//android.widget.TextView[@resource-id='GRID_SELECTION_WIDGET_TEST_TAG_TITLE']"
+  },
+  "hind_lanuage": {
+    "id": "SELECTABLE_CONTENT_CARD_TEST_card_withId_hin",
+    "xpath": "//*[@resource-id='SELECTABLE_CONTENT_CARD_TEST_card_withId_hin']"
+  },
+  "kannad_lanuage_select": {
+    "id": "SELECTABLE_CONTENT_CARD_TEST_card_withId_kan"
+  },
+  "continue_button": {
+    "xpath": "//*[@resource-id='tag_label_button_layout']"
+  },
+  "verify_bottom_menu_home": {
+    "xpath": "//*[@content-desc='Search']"
+  },
+  "continue": {
+    "xpath" : "//android.widget.Button[@content-desc='Continue']"
+  }
+
+}
