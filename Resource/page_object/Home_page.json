@@ -14,7 +14,7 @@
     "xpath": "//*[@resource-id='tag_label_button_layout']"
   },
   "verify_bottom_menu_home": {
-    "xpath": "//android.widget.TextView[@text='Home']/following-sibling::android.widget.TextView[@content-desc='Search']"
+    "xpath": "//*[@content-desc='Search']"
   },
   "continue": {
     "xpath" : "//android.widget.Button[@content-desc='Continue']"

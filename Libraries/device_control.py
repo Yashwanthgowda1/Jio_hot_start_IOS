@@ -1,7 +1,7 @@
 import subprocess
 import os
 import time
-import  shared_utils
+from Libraries import shared_utils
 from appium.webdriver.common.appiumby import AppiumBy
 
 from Libraries import device_manager

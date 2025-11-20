@@ -5,7 +5,7 @@ from robot.libraries.BuiltIn import BuiltIn
 import os
 import subprocess
 from  Libraries import device_control
-import shared_utils
+from Libraries import shared_utils
 import requests
 from selenium import webdriver as chrome_webdriver 
 
@@ -179,3 +179,6 @@ def tear_down_driver(device=None):
                     print(f"{device}:  Error closing driver: {e}")
             else:
                 print(f"{device}: No active driver found to close.")
+
+def get_existing_driver(device):
+    return DriverManger._driver_store.get(device)

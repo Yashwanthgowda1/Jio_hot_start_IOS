@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2025-11-20T12:28:48.093330" rpa="false" schemaversion="5">
+<suite id="s1" name="Jio hot start IOS" source="C:\python_study\Jio_hot_start_IOS">
+<suite id="s1-s1" name="Resource" source="C:\python_study\Jio_hot_start_IOS\Resource">
+<suite id="s1-s1-s1" name="Keywords" source="C:\python_study\Jio_hot_start_IOS\Resource\Keywords">
+<suite id="s1-s1-s1-s1" name="Home page" source="C:\python_study\Jio_hot_start_IOS\Resource\Keywords\Home_page.robot">
+<test id="s1-s1-s1-s1-t1" name="Launch Application" line="6">
+<kw name="Launch And Signin Verify Home Page">
+<kw name="launch_jio_hotstar_application">
+<msg time="2025-11-20T12:28:48.538461" level="FAIL">No keyword with name 'launch_jio_hotstar_application' found.</msg>
+<arg>device=device_1</arg>
+<status status="FAIL" start="2025-11-20T12:28:48.537675" elapsed="0.002399">No keyword with name 'launch_jio_hotstar_application' found.</status>
+</kw>
+<status status="FAIL" start="2025-11-20T12:28:48.536585" elapsed="0.004134">No keyword with name 'launch_jio_hotstar_application' found.</status>
+</kw>
+<tag>56788</tag>
+<status status="FAIL" start="2025-11-20T12:28:48.532746" elapsed="0.008155">No keyword with name 'launch_jio_hotstar_application' found.</status>
+</test>
+<status status="FAIL" start="2025-11-20T12:28:48.136904" elapsed="0.406521"/>
+</suite>
+<status status="FAIL" start="2025-11-20T12:28:48.132686" elapsed="0.412895"/>
+</suite>
+<status status="FAIL" start="2025-11-20T12:28:48.129055" elapsed="0.417870"/>
+</suite>
+<status status="FAIL" start="2025-11-20T12:28:48.101104" elapsed="0.447081"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="1" skip="0">56788</stat>
+</tag>
+<suite>
+<stat name="Jio hot start IOS" id="s1" pass="0" fail="1" skip="0">Jio hot start IOS</stat>
+<stat name="Resource" id="s1-s1" pass="0" fail="1" skip="0">Jio hot start IOS.Resource</stat>
+<stat name="Keywords" id="s1-s1-s1" pass="0" fail="1" skip="0">Jio hot start IOS.Resource.Keywords</stat>
+<stat name="Home page" id="s1-s1-s1-s1" pass="0" fail="1" skip="0">Jio hot start IOS.Resource.Keywords.Home page</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2025-11-20T12:28:48.525221" level="ERROR">Error in file 'C:\python_study\Jio_hot_start_IOS\Resource\Keywords\Home_page.robot' on line 2: Importing library 'C:\python_study\Jio_hot_start_IOS\Resource\Keywords\sign_in.py' failed: ModuleNotFoundError: No module named 'Libraries'
+Traceback (most recent call last):
+  File "C:\python_study\Jio_hot_start_IOS\Resource\Keywords\sign_in.py", line 4, in &lt;module&gt;
+    from Libraries import shared_utils
+PYTHONPATH:
+  C:\python_study\Jio_hot_start_IOS\Resource\Keywords
+  C:\python_study\Jio_hot_start_IOS\lib
+  C:\python_study\Jio_hot_start_IOS\resources
+  C:\Users\C5403671\AppData\Roaming\JetBrains\PyCharmCE2025.2\plugins\robotcode4ij\data\bundled\libs
+  C:\Users\C5403671\AppData\Roaming\JetBrains\PyCharmCE2025.2\plugins\robotcode4ij\data\bundled\tool\robotcode
+  C:\python_study\OTT\Robot_frework_OTT
+  C:\python_study\Jio_hot_start_IOS\.venv\Scripts\python313.zip
+  C:\Users\C5403671\AppData\Local\Programs\Python\Python313\DLLs
+  C:\Users\C5403671\AppData\Local\Programs\Python\Python313\Lib
+  C:\Users\C5403671\AppData\Local\Programs\Python\Python313
+  C:\python_study\Jio_hot_start_IOS\.venv
+  C:\python_study\Jio_hot_start_IOS\.venv\Lib\site-packages</msg>
+</errors>
+</robot>

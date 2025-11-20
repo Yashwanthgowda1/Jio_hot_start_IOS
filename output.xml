@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.13.7 on win32)" generated="2025-11-20T15:14:28.790894" rpa="false" schemaversion="5">
+<suite id="s1" name="Home page" source="C:\python_study\Jio_hot_start_IOS\Resource\Keywords\Home_page.robot">
+<test id="s1-t1" name="Launch Application" line="7">
+<kw name="Launch And Signin Verify Home Page">
+<kw name="Launch Jio Hotstar Application" owner="sign_in">
+<msg time="2025-11-20T15:15:28.894223" level="INFO">before clear cahing checking the device existing emulator-5554
+ Cache cleared successfully on 0
+
+Connected devices:
+0. emulator-5554
+[Sucess] Device emulator-5554 is [online]
+devices: Appium version 1.22.3, endpointSuffix=/wd/hub
+Setting up Appium driver for device_1 with caps: {'appActivity': 'com.hotstar.MainActivity', 'appPackage': 'in.startv.hotstar', 'automationName': 'UiAutomator2', 'platformName': 'android', 'deviceName': 'Android', 'newCommandTimeout': 90000, 'optionalIntentArguments': '--esn automation'}
+Connecting to Appium server at: http://127.0.0.1:4723/wd/hub
+Driver session started for device_1
+Launching Jio Hotstar app on device_1...
+device_1: Sleeping 30s: waiting to load the driver application</msg>
+<arg>device=device_1</arg>
+<status status="PASS" start="2025-11-20T15:14:29.186471" elapsed="59.707871"/>
+</kw>
+<kw name="Click Continue And Sigin To Device" owner="sign_in">
+<msg time="2025-11-20T15:15:32.365983" level="INFO">[device_1] ✅ Element found: continue
+device_1: Sleeping 2s: Clicked Continue button</msg>
+<arg>device=device_1</arg>
+<status status="PASS" start="2025-11-20T15:15:28.894496" elapsed="3.471660"/>
+</kw>
+<kw name="Select Required Ott Languages" owner="sign_in">
+<msg time="2025-11-20T15:15:35.172407" level="INFO">[device_1] ✅ Element found: verify_bottom_menu_home
+Language selection successful and Home screen visible.</msg>
+<arg>device=device_1</arg>
+<status status="PASS" start="2025-11-20T15:15:32.366403" elapsed="2.806091"/>
+</kw>
+<kw name="Swipe Up" owner="shared_utils">
+<arg>device=device_1</arg>
+<status status="PASS" start="2025-11-20T15:15:35.172624" elapsed="1.520088"/>
+</kw>
+<status status="PASS" start="2025-11-20T15:14:29.185877" elapsed="67.506997"/>
+</kw>
+<tag>56788</tag>
+<status status="PASS" start="2025-11-20T15:14:29.185316" elapsed="67.508118"/>
+</test>
+<status status="PASS" start="2025-11-20T15:14:28.792513" elapsed="67.901946"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">56788</stat>
+</tag>
+<suite>
+<stat name="Home page" id="s1" pass="1" fail="0" skip="0">Home page</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
