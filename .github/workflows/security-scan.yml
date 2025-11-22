@@ -1,0 +1,139 @@
+name: '🔒 Production Security Scan'
+
+# When to run this workflow
+on:
+  pull_request:                    # Every pull request
+  push:
+    branches: [main, master]       # Every push to main/master
+  schedule:
+    - cron: '0 2 * * 1'           # Every Monday at 2 AM (weekly check)
+
+# What this workflow can do
+permissions:
+  contents: read                   # Read your code
+  security-events: write          # Write to Security tab
+  actions: read                   # Read workflow info
+
+jobs:
+  security:
+    name: '🔒 Security Check - Secrets, Licenses, Vulnerabilities'
+    runs-on: ubuntu-latest
+    
+    steps:
+      # ═══════════════════════════════════════
+      # GET THE CODE
+      # ═══════════════════════════════════════
+      - name: '📥 Get Code'
+        uses: actions/checkout@v3
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 1: Find Secrets (Passwords, Keys)
+      # Will FAIL the build if secrets found
+      # ═══════════════════════════════════════
+      - name: '🔐 Check for Secrets'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          format: 'table'
+          exit-code: '1'           # FAIL if secrets found ❌
+        continue-on-error: false
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 2: Check Licenses (GPL = Bad)
+      # Will FAIL on problematic licenses
+      # ═══════════════════════════════════════
+      - name: '⚖️ Check Licenses'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'license'
+          format: 'table'
+          exit-code: '1'           # FAIL on policy violation ❌
+        continue-on-error: false
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 3: Find Vulnerabilities (Bugs)
+      # Will FAIL for HIGH/CRITICAL bugs
+      # ═══════════════════════════════════════
+      - name: '🐛 Check Vulnerabilities'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          format: 'table'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'           # FAIL if bugs found ❌
+          ignore-unfixed: true     # Only fail for fixable bugs
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 4: Upload to GitHub Security Tab
+      # Creates SARIF report and uploads it
+      # ═══════════════════════════════════════
+      - name: '🛡️ Generate SARIF Report'
+        if: always()
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: '📤 Upload to Security Tab'
+        if: always()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 5: Save JSON Report as Artifact
+      # You can download this later
+      # ═══════════════════════════════════════
+      - name: '📊 Generate JSON Report'
+        if: always()
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'json'
+          output: 'security-report.json'
+      
+      - name: '📥 Upload Report Artifact'
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: security-report
+          path: security-report.json
+          retention-days: 30      # Keep for 30 days
+      
+      
+      # ═══════════════════════════════════════
+      # STEP 6: Show Summary
+      # Creates nice summary in GitHub UI
+      # ═══════════════════════════════════════
+      - name: '📋 Create Summary'
+        if: always()
+        run: |
+          echo "# 🔒 Security Scan Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## What was checked:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Secrets** - Passwords, API keys, tokens" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Licenses** - GPL, LGPL, proprietary licenses" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Vulnerabilities** - Security bugs (HIGH & CRITICAL)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Reports Available:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 🛡️ **Security Tab**: Check the 'Security' tab for details" >> $GITHUB_STEP_SUMMARY
+          echo "- 📥 **JSON Report**: Download from 'Artifacts' section below" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "_Next scheduled scan: Every Monday at 2 AM UTC_" >> $GITHUB_STEP_SUMMARY
