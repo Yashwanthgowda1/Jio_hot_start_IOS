@@ -2,6 +2,7 @@ import json
 import time
 import subprocess
 import os
+from appium.webdriver.common.touch_action import TouchAction
 
 
 from robot.api import logger
@@ -24,7 +25,7 @@ def _init_config(file_name: str):
     with open(file_name, "r") as f:
         return json.load(f)
 
-file_path = r"C:\python_study\Jio_hot_start_IOS\config.json"
+file_path = "config.json"
 config = _init_config(file_path)
 print(f"Config loaded: {config}")
 
@@ -102,14 +103,21 @@ def get_top_level_device_port(device):
 def take_screenshot(driver, device_name, base_log_dir):
     timestamp = time.strftime("%Y%m%d_%H%M%S")
 
-    # Make device-specific screenshot folder
-    screenshot_dir = os.path.join(base_log_dir, device_name)
+    # Root folder (your custom directory)
+    directory_name = "screenshots"
+    root_dir = os.path.join("./reports",directory_name, device_name)
+
+    # Create root directory if missing
+    os.makedirs(root_dir, exist_ok=True)
+
+    # Device-specific folder inside "logs and screenshots"
+    screenshot_dir = os.path.join(root_dir, base_log_dir)
     os.makedirs(screenshot_dir, exist_ok=True)
 
-    # File Path
+    # Final file path
     file_path = os.path.join(screenshot_dir, f"screenshot_{timestamp}.png")
 
-    # Capture
+    # Capture screenshot
     driver.get_screenshot_as_file(file_path)
 
     return file_path
@@ -143,6 +151,7 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
             by_map = {
                 "xpath": AppiumBy.XPATH,
                 "id": AppiumBy.ACCESSIBILITY_ID,
+                "id2": AppiumBy.ID,
                 "class_name": AppiumBy.CLASS_NAME,
                 "android_ui_automator": AppiumBy.ANDROID_UIAUTOMATOR
             }
@@ -173,14 +182,14 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
                         EC.presence_of_all_elements_located((by, loc_value))
                     )
 
-                # SUCCESS
-                print(f"[{dev}] ✅ Element found: {locator_key}")
+                print(f"[{dev}]  Element found: {locator_key}")
                 return elem
 
             except Exception:
-                print(f"[{dev}] ❌ Locator failed: {locator_key} → trying next")
-                take_screenshot(driver, dev, f"{locator_key}_not_found")
-        raise Exception(f"[{dev}] ❌ Element '{locator_key}' NOT FOUND")
+                print(f"[{dev}]  Locator failed: {locator_key} → trying next")
+
+        take_screenshot(driver, dev, f"{locator_key}_not_found")
+        raise Exception(f"[{dev}]  Element '{locator_key}' NOT FOUND")
 
 
 def find_elements(devices, locator_dict, locator_key, timeout=10):
@@ -251,4 +260,40 @@ def swipe_till_end(device):
             print(f"{device}: Reached end of page.")
             break
 
+def swipe_left(device):
+        driver = device_manager.get_existing_driver(device)
+        size = device.get_window_size()
 
+        start_x = int(size['width'] * 0.8)   # right side
+        end_x   = int(size['width'] * 0.2)   # left side
+        y       = int(size['height'] * 0.5)  # middle
+
+        actions = TouchAction(driver)
+        actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
+
+def swipe_left_multiple(device, count=3):
+    for _ in range(count):
+        swipe_left(device)
+
+def swipe_right(device):
+        driver = device_manager.get_existing_driver(device)
+        size = device.get_window_size()
+
+        start_x = int(size['width'] * 0.2)   # left side
+        end_x   = int(size['width'] * 0.8)   # right side
+        y       = int(size['height'] * 0.5)  # middle
+
+        actions = TouchAction(driver)
+        actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
+
+
+def swipe_left_to_right_fav_shows(device, element):
+    driver = device_manager.get_existing_driver(device)
+    size = element.size
+    location = element.location
+    start_x = location['x'] + size['width'] * 0.8
+    end_x   = location['x'] + size['width'] * 0.2
+    y = location['y'] + size['height'] / 2
+    driver.swipe(start_x, y, end_x, y, 800)
+
+        

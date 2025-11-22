@@ -1,0 +1,30 @@
+{
+    "main_tv_shows_menu_home_page":{
+        "xpath":"//android.view.View[@resource-id='test_tag_landing_page_navigation_sub_menu']/android.view.View"
+    },
+
+    "tv_shows_first_item":{
+        "id":"TV"
+    },
+    "clsoe_filter_button":{
+        "id":"Close filter"
+    },
+    "family_show_filter_option":{
+        "id2":"Family Shows"
+    },
+    "select_the_show_favritos":{
+        "xpath":"//android.view.View[contains(@resource-id,'Kids Shows']"
+    },
+    "scroll_the_favriout_section_left_right":{
+        "xpath": "//android.view.View[@resource-id='tag_box_masthead_tray']",
+        "android_ui_automator":"new UiSelector().resourceId('tag_content_regular_tray').instance(3)"
+
+    },
+    "select_home_drame_required_movie_click":{
+        "xpath": "//android.view.View[@resource-id='tag_box_masthead_tray']"
+
+
+    }
+
+
+}
