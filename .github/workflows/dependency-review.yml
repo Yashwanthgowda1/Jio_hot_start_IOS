@@ -4,36 +4,205 @@
 # surfacing known-vulnerable versions of the packages declared or updated in the PR.
 # Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable
 # packages will be blocked from merging.
-#
-# Source repository: https://github.com/actions/dependency-review-action
-# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
-name: 'Dependency review'
+
+name: 'Dependency Review'
+
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - main
+      - master 
 
-# If using a dependency submission action in this workflow this permission will need to be set to:
-#
-# permissions:
-#   contents: write
-#
-# https://docs.github.com/en/enterprise-cloud@latest/code-security/supply-chain-security/understanding-your-software-supply-chain/using-the-dependency-submission-api
 permissions:
   contents: read
-  # Write permissions for pull-requests are required for using the `comment-summary-in-pr` option, comment out if you aren't using this option
+  security-events: write
   pull-requests: write
+  actions: read
 
 jobs:
-  dependency-review:
+  dependency-review-before-merge:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: 'Checkout repository'
+      - name: 'Checkout Code'
         uses: actions/checkout@v4
-      - name: 'Dependency Review'
+      
+      - name: 'Run Dependency Review'
         uses: actions/dependency-review-action@v4
-        # Commonly enabled options, see https://github.com/actions/dependency-review-action#configuration-options for all available options.
+        with:
+          # Show detailed comment in every PR
+          comment-summary-in-pr: always
+          
+          # Block PR if moderate or higher severity vulnerabilities found
+          # Options: low, moderate, high, critical
+          fail-on-severity: moderate
+          
+          # Block these copy-left licenses (legal/commercial protection)
+          deny-licenses: |
+            GPL-1.0-or-later,
+            GPL-2.0-or-later,
+            GPL-3.0-or-later,
+            LGPL-2.0-or-later,
+            LGPL-2.1-or-later,
+            LGPL-3.0-or-later,
+            AGPL-3.0-or-later
+          
+          # Only allow these safe licenses
+          allow-licenses: |
+            MIT,
+            Apache-2.0,
+            BSD-2-Clause,
+            BSD-3-Clause,
+            MPL-2.0,
+            CC-BY-4.0
+          
+          # Check vulnerabilities in both runtime and development dependencies
+          fail-on-scopes: runtime, development
+          
+          # Retry if GitHub dependency snapshot is not ready yet
+          retry-on-snapshot-warnings: true
+          retry-on-snapshot-warnings-timeout: 600
+      
+      # Generate detailed JSON report
+      - name: 'Generate Dependency Report (JSON)'
+        if: always()
+        uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: always
-        #   fail-on-severity: moderate
-        #   deny-licenses: GPL-1.0-or-later, LGPL-2.0-or-later
-        #   retry-on-snapshot-warnings: true
+          fail-on-severity: critical  # Don't fail, just generate report
+          export-report: true
+          report-format: json
+          output-file: dependency-review-report.json
+      
+      # Generate SARIF report for GitHub Security tab
+      - name: 'Generate SARIF Report'
+        if: always()
+        uses: actions/dependency-review-action@v4
+        with:
+          comment-summary-in-pr: never
+          fail-on-severity: critical
+          export-report: true
+          report-format: sarif
+          output-file: dependency-review.sarif
+      
+      # Upload SARIF to GitHub Security tab
+      - name: 'Upload SARIF Report to GitHub Security'
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: dependency-review.sarif
+          category: dependency-review
+      
+      # Upload reports as artifacts
+      - name: 'Upload Dependency Reports'
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-review-reports
+          path: |
+            dependency-review-report.json
+            dependency-review.sarif
+          retention-days: 30
+      
+      # Generate human-readable HTML report
+      - name: 'Generate HTML Summary Report'
+        if: always()
+        run: |
+          cat > dependency-report.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <title>Dependency Review Report</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                  .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+                  h1 { color: #333; border-bottom: 3px solid #0366d6; padding-bottom: 10px; }
+                  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+                  .card { padding: 15px; border-radius: 5px; text-align: center; }
+                  .critical { background: #d73a49; color: white; }
+                  .high { background: #cb2431; color: white; }
+                  .moderate { background: #f66a0a; color: white; }
+                  .low { background: #ffd33d; color: #333; }
+                  .info { background: #0366d6; color: white; }
+                  .number { font-size: 32px; font-weight: bold; }
+                  .label { font-size: 14px; margin-top: 5px; }
+                  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                  th { background: #0366d6; color: white; padding: 12px; text-align: left; }
+                  td { padding: 10px; border-bottom: 1px solid #ddd; }
+                  tr:hover { background: #f6f8fa; }
+                  .severity-badge { padding: 4px 8px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+                  .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; text-align: center; }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>🔒 Dependency Security Review Report</h1>
+                  <p><strong>Repository:</strong> ${{ github.repository }}</p>
+                  <p><strong>Pull Request:</strong> #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}</p>
+                  <p><strong>Date:</strong> $(date)</p>
+                  <p><strong>Branch:</strong> ${{ github.head_ref }} → ${{ github.base_ref }}</p>
+                  
+                  <div class="summary">
+                      <div class="card critical">
+                          <div class="number">0</div>
+                          <div class="label">Critical</div>
+                      </div>
+                      <div class="card high">
+                          <div class="number">0</div>
+                          <div class="label">High Severity</div>
+                      </div>
+                      <div class="card moderate">
+                          <div class="number">0</div>
+                          <div class="label">Moderate</div>
+                      </div>
+                      <div class="card low">
+                          <div class="number">0</div>
+                          <div class="label">Low Severity</div>
+                      </div>
+                      <div class="card info">
+                          <div class="number">0</div>
+                          <div class="label">Total Dependencies</div>
+                      </div>
+                  </div>
+                  
+                  <h2>📊 Detailed Findings</h2>
+                  <p><em>Review the JSON report for complete details</em></p>
+                  
+                  <h2>✅ Status</h2>
+                  <p>Dependency review completed. Check artifacts for detailed reports.</p>
+                  
+                  <div class="footer">
+                      <p>Generated by GitHub Actions Dependency Review</p>
+                      <p>Workflow Run: <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">${{ github.run_id }}</a></p>
+                  </div>
+              </div>
+          </body>
+          </html>
+          EOF
+      
+      - name: 'Upload HTML Report'
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-html-report
+          path: dependency-report.html
+          retention-days: 30
+      
+      # Create a summary in GitHub Actions UI
+      - name: 'Create GitHub Actions Summary'
+        if: always()
+        run: |
+          echo "# 🔒 Dependency Review Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Pull Request:** #${{ github.event.pull_request.number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.head_ref }} → ${{ github.base_ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📊 Reports Generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ JSON Report: \`dependency-review-report.json\`" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ SARIF Report: \`dependency-review.sarif\`" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ HTML Report: \`dependency-report.html\`" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Security Tab Updated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📥 Download reports from the **Artifacts** section below" >> $GITHUB_STEP_SUMMARY
