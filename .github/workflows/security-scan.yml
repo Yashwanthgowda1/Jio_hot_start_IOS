@@ -24,7 +24,7 @@ jobs:
       # GET THE CODE
       # ═══════════════════════════════════════
       - name: '📥 Get Code'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       
       
       # ═══════════════════════════════════════
@@ -88,7 +88,7 @@ jobs:
       
       - name: '📤 Upload to Security Tab'
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'trivy-results.sarif'
       
@@ -108,7 +108,7 @@ jobs:
       
       - name: '📥 Upload Report Artifact'
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-report
           path: security-report.json
