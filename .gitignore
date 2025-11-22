@@ -1,0 +1,8 @@
+reports/
+__pycache__/
+env/
+.venv/
+.robotcode_cache/
+configs/
+configs.json
+.idea/

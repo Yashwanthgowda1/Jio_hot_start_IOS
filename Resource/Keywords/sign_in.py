@@ -5,9 +5,7 @@ from Libraries import shared_utils
 from Libraries import device_control
 from Libraries import device_manager
 
-home_page_dict = shared_utils.load_loctors(
-    r"C:\python_study\Jio_hot_start_IOS\Resource\page_object\Home_page.json"
-)
+home_page_dict = shared_utils.load_loctors("Resource\page_object\Home_page.json")
 
 class sign_in:
 
