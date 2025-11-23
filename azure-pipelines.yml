@@ -1,0 +1,585 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+# ═══════════════════════════════════════════════════════════════════
+# Azure DevOps CI/CD Pipeline - Mobile & Web Automation Testing
+# ═══════════════════════════════════════════════════════════════════
+# Automatically runs tests from 'tests/' folder on every push to main
+# Executes Mobile and Web tests in parallel
+# Stores all artifacts in Azure DevOps
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+# Trigger pipeline on push to main/develop branches
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - Test/**
+      - azure-pipelines.yml
+      - requirements.txt
+
+# Disable pull request triggers (optional - remove if you want PR builds)
+pr: none
+
+# Global variables
+variables:
+  pythonVersion: '3.11'
+  artifactName: 'TestResults-$(Build.BuildNumber)'
+
+# ═══════════════════════════════════════════════════════════════════
+# STAGE 1: PARALLEL EXECUTION - MOBILE & WEB
+# ═══════════════════════════════════════════════════════════════════
+stages:
+  - stage: TestExecution
+    displayName: '🚀 Execute Automation Tests'
+    jobs:
+      
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # JOB 1: MOBILE TESTING
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      - job: MobileTests
+        displayName: '📱 Mobile Tests Execution'
+        pool:
+          vmImage: 'macos-latest'  # macOS for Android emulator support
+        timeoutInMinutes: 90
+        
+        steps:
+          # Step 1: Checkout repository
+          - checkout: self
+            displayName: '📥 Checkout Source Code'
+            clean: true
+
+          # Step 2: Setup Python
+          - task: UsePythonVersion@0
+            displayName: '🐍 Setup Python $(pythonVersion)'
+            inputs:
+              versionSpec: '$(pythonVersion)'
+              addToPath: true
+
+          # Step 3: Install Python dependencies
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📦 Installing Python Dependencies"
+              echo "════════════════════════════════════════════════════════"
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              echo ""
+              echo "✅ Installed packages:"
+              pip list | grep -E 'robot|selenium|appium'
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📦 Install Python Dependencies'
+
+          # Step 4: Setup Java (required for Android)
+          - task: JavaToolInstaller@0
+            displayName: '☕ Install Java JDK'
+            inputs:
+              versionSpec: '11'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+
+          # Step 5: Setup Android SDK
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🤖 Setting up Android SDK"
+              echo "════════════════════════════════════════════════════════"
+              
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
+              
+              # Accept licenses
+              yes | $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
+              
+              # Install SDK components
+              $ANDROID_HOME/tools/bin/sdkmanager "platform-tools" "platforms;android-30" "build-tools;30.0.3" "emulator" "system-images;android-30;google_apis;x86_64"
+              
+              echo "✅ Android SDK setup complete"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🤖 Setup Android SDK'
+
+          # Step 6: Create Android Emulator
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📱 Creating Android Emulator"
+              echo "════════════════════════════════════════════════════════"
+              
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/tools/bin
+              
+              echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd \
+                -n test_emulator \
+                -k "system-images;android-30;google_apis;x86_64" \
+                -d "pixel_3" \
+                --force
+              
+              $ANDROID_HOME/tools/bin/avdmanager list avd
+              
+              echo "✅ Emulator created"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📱 Create Android Emulator'
+
+          # Step 7: Start Android Emulator
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🚀 Starting Android Emulator"
+              echo "════════════════════════════════════════════════════════"
+              
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools
+              
+              # Start emulator in background
+              nohup $ANDROID_HOME/emulator/emulator -avd test_emulator -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect > emulator.log 2>&1 &
+              
+              # Wait for device
+              echo "⏳ Waiting for emulator to boot..."
+              $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+              
+              # Verify emulator
+              $ANDROID_HOME/platform-tools/adb devices
+              
+              echo "✅ Emulator is ready"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🚀 Start Android Emulator'
+            timeoutInMinutes: 15
+
+          # Step 8: Install Appium
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📲 Installing Appium"
+              echo "════════════════════════════════════════════════════════"
+              npm install -g appium@2.0.0
+              appium driver install uiautomator2
+              appium --version
+              echo "✅ Appium installed"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📲 Install Appium'
+
+          # Step 9: Start Appium Server
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🌐 Starting Appium Server"
+              echo "════════════════════════════════════════════════════════"
+              nohup appium --log-level info > appium.log 2>&1 &
+              sleep 5
+              echo "✅ Appium server running on http://localhost:4723"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🌐 Start Appium Server'
+
+          # Step 10: Run Mobile Tests
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🧪 RUNNING MOBILE TESTS FROM tests/mobile/ FOLDER"
+              echo "════════════════════════════════════════════════════════"
+              
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/platform-tools
+              
+              # Create results directory
+              mkdir -p $(Build.ArtifactStagingDirectory)/mobile_results
+              
+              # Run Robot Framework tests from tests/mobile folder
+              robot \
+                --outputdir $(Build.ArtifactStagingDirectory)/mobile_results \
+                --output mobile_output.xml \
+                --log mobile_log.html \
+                --report mobile_report.html \
+                --xunit mobile_xunit.xml \
+                --loglevel INFO \
+                --variable PLATFORM:Android \
+                --name "Mobile Test Suite" \
+                --consolecolors on \
+                tests/mobile/ || true
+              
+              echo ""
+              echo "════════════════════════════════════════════════════════"
+              echo "📊 Mobile Test Execution Summary"
+              echo "════════════════════════════════════════════════════════"
+              
+              if [ -f $(Build.ArtifactStagingDirectory)/mobile_results/mobile_output.xml ]; then
+                PASSED=$(grep -oP 'pass="\K[0-9]+' $(Build.ArtifactStagingDirectory)/mobile_results/mobile_output.xml | head -1 || echo "0")
+                FAILED=$(grep -oP 'fail="\K[0-9]+' $(Build.ArtifactStagingDirectory)/mobile_results/mobile_output.xml | head -1 || echo "0")
+                echo "✅ Tests Passed: $PASSED"
+                echo "❌ Tests Failed: $FAILED"
+              else
+                echo "⚠️  No test results found"
+              fi
+              
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🧪 Execute Mobile Tests'
+            continueOnError: true
+
+          # Step 11: Capture emulator screenshot
+          - script: |
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/platform-tools
+              mkdir -p $(Build.ArtifactStagingDirectory)/mobile_results/screenshots
+              adb exec-out screencap -p > $(Build.ArtifactStagingDirectory)/mobile_results/screenshots/final_screenshot.png || true
+            displayName: '📸 Capture Final Screenshot'
+            condition: always()
+
+          # Step 12: Stop emulator
+          - script: |
+              export ANDROID_HOME=$HOME/Library/Android/sdk
+              export PATH=$PATH:$ANDROID_HOME/platform-tools
+              adb emu kill || true
+            displayName: '🛑 Stop Emulator'
+            condition: always()
+
+          # Step 13: Publish Mobile Test Results
+          - task: PublishTestResults@2
+            displayName: '📊 Publish Mobile Test Results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(Build.ArtifactStagingDirectory)/mobile_results/mobile_xunit.xml'
+              testRunTitle: '📱 Mobile Tests'
+              failTaskOnFailedTests: false
+              publishRunAttachments: true
+
+          # Step 14: Publish Mobile Artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: '📦 Publish Mobile Artifacts'
+            condition: always()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/mobile_results'
+              ArtifactName: '📱_Mobile_Results'
+              publishLocation: 'Container'
+
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # JOB 2: WEB TESTING
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      - job: WebTests
+        displayName: '🌐 Web Tests Execution'
+        pool:
+          vmImage: 'ubuntu-latest'
+        timeoutInMinutes: 60
+        
+        steps:
+          # Step 1: Checkout repository
+          - checkout: self
+            displayName: '📥 Checkout Source Code'
+            clean: true
+
+          # Step 2: Setup Python
+          - task: UsePythonVersion@0
+            displayName: '🐍 Setup Python $(pythonVersion)'
+            inputs:
+              versionSpec: '$(pythonVersion)'
+              addToPath: true
+
+          # Step 3: Install system dependencies
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🔧 Installing System Dependencies"
+              echo "════════════════════════════════════════════════════════"
+              sudo apt-get update
+              sudo apt-get install -y wget unzip xvfb
+              echo "✅ System dependencies installed"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🔧 Install System Dependencies'
+
+          # Step 4: Install Chrome
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🌐 Installing Google Chrome"
+              echo "════════════════════════════════════════════════════════"
+              wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+              sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
+              google-chrome --version
+              echo "✅ Chrome installed"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🌐 Install Google Chrome'
+
+          # Step 5: Install ChromeDriver
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🚗 Installing ChromeDriver"
+              echo "════════════════════════════════════════════════════════"
+              
+              CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1)
+              echo "Chrome version: $CHROME_VERSION"
+              
+              CHROMEDRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}")
+              echo "ChromeDriver version: $CHROMEDRIVER_VERSION"
+              
+              wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+              unzip -q chromedriver_linux64.zip
+              sudo mv chromedriver /usr/local/bin/
+              sudo chmod +x /usr/local/bin/chromedriver
+              chromedriver --version
+              
+              rm chromedriver_linux64.zip
+              echo "✅ ChromeDriver installed"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🚗 Install ChromeDriver'
+
+          # Step 6: Install Python dependencies
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📦 Installing Python Dependencies"
+              echo "════════════════════════════════════════════════════════"
+              python -m pip install --upgrade pip
+              pip install -r requirements.txt
+              echo ""
+              echo "✅ Installed packages:"
+              pip list | grep -E 'robot|selenium'
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📦 Install Python Dependencies'
+
+          # Step 7: Verify installations
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "✅ Verification"
+              echo "════════════════════════════════════════════════════════"
+              echo "Python: $(python --version)"
+              echo "Robot Framework: $(robot --version)"
+              echo "Chrome: $(google-chrome --version)"
+              echo "ChromeDriver: $(chromedriver --version)"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '✅ Verify Installations'
+
+          # Step 8: Start Xvfb (Virtual Display)
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🖥️  Starting Virtual Display"
+              echo "════════════════════════════════════════════════════════"
+              export DISPLAY=:99
+              Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+              sleep 3
+              echo "✅ Virtual display started on :99"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🖥️ Start Virtual Display'
+
+          # Step 9: Run Web Tests
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🧪 RUNNING WEB TESTS FROM tests/web/ FOLDER"
+              echo "════════════════════════════════════════════════════════"
+              
+              export DISPLAY=:99
+              
+              # Create results directory
+              mkdir -p $(Build.ArtifactStagingDirectory)/web_results
+              
+              # Run Robot Framework tests from tests/web folder
+              robot \
+                --outputdir $(Build.ArtifactStagingDirectory)/web_results \
+                --output web_output.xml \
+                --log web_log.html \
+                --report web_report.html \
+                --xunit web_xunit.xml \
+                --loglevel INFO \
+                --variable BROWSER:headlesschrome \
+                --variable PLATFORM:Web \
+                --name "Web Test Suite" \
+                --consolecolors on \
+                tests/web/ || true
+              
+              echo ""
+              echo "════════════════════════════════════════════════════════"
+              echo "📊 Web Test Execution Summary"
+              echo "════════════════════════════════════════════════════════"
+              
+              if [ -f $(Build.ArtifactStagingDirectory)/web_results/web_output.xml ]; then
+                PASSED=$(grep -oP 'pass="\K[0-9]+' $(Build.ArtifactStagingDirectory)/web_results/web_output.xml | head -1 || echo "0")
+                FAILED=$(grep -oP 'fail="\K[0-9]+' $(Build.ArtifactStagingDirectory)/web_results/web_output.xml | head -1 || echo "0")
+                echo "✅ Tests Passed: $PASSED"
+                echo "❌ Tests Failed: $FAILED"
+              else
+                echo "⚠️  No test results found"
+              fi
+              
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🧪 Execute Web Tests'
+            continueOnError: true
+
+          # Step 10: Publish Web Test Results
+          - task: PublishTestResults@2
+            displayName: '📊 Publish Web Test Results'
+            condition: always()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(Build.ArtifactStagingDirectory)/web_results/web_xunit.xml'
+              testRunTitle: '🌐 Web Tests'
+              failTaskOnFailedTests: false
+              publishRunAttachments: true
+
+          # Step 11: Publish Web Artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: '📦 Publish Web Artifacts'
+            condition: always()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/web_results'
+              ArtifactName: '🌐_Web_Results'
+              publishLocation: 'Container'
+
+  # ═══════════════════════════════════════════════════════════════════
+  # STAGE 2: CONSOLIDATE AND REPORT
+  # ═══════════════════════════════════════════════════════════════════
+  - stage: GenerateReports
+    displayName: '📊 Generate Final Reports'
+    dependsOn: TestExecution
+    condition: always()
+    jobs:
+      - job: ConsolidateResults
+        displayName: '📋 Consolidate Test Results'
+        pool:
+          vmImage: 'ubuntu-latest'
+        
+        steps:
+          # Step 1: Setup Python
+          - task: UsePythonVersion@0
+            displayName: '🐍 Setup Python'
+            inputs:
+              versionSpec: '$(pythonVersion)'
+
+          # Step 2: Install Robot Framework
+          - script: |
+              pip install robotframework robotframework-metrics
+            displayName: '📦 Install Robot Framework'
+
+          # Step 3: Download Mobile results
+          - task: DownloadBuildArtifacts@1
+            displayName: '📥 Download Mobile Results'
+            continueOnError: true
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: '📱_Mobile_Results'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          # Step 4: Download Web results
+          - task: DownloadBuildArtifacts@1
+            displayName: '📥 Download Web Results'
+            continueOnError: true
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: '🌐_Web_Results'
+              downloadPath: '$(System.ArtifactsDirectory)'
+
+          # Step 5: Merge and generate combined report
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "🔄 Merging Test Results"
+              echo "════════════════════════════════════════════════════════"
+              
+              mkdir -p $(Build.ArtifactStagingDirectory)/Final_Results
+              
+              # Copy all individual results
+              cp -r "$(System.ArtifactsDirectory)/📱_Mobile_Results"/* $(Build.ArtifactStagingDirectory)/Final_Results/ 2>/dev/null || echo "No mobile results"
+              cp -r "$(System.ArtifactsDirectory)/🌐_Web_Results"/* $(Build.ArtifactStagingDirectory)/Final_Results/ 2>/dev/null || echo "No web results"
+              
+              # Merge XML outputs
+              cd $(Build.ArtifactStagingDirectory)/Final_Results
+              
+              rebot \
+                --outputdir . \
+                --output combined_output.xml \
+                --log combined_log.html \
+                --report combined_report.html \
+                --name "Mobile + Web Combined Results" \
+                --merge \
+                *_output.xml 2>/dev/null || echo "Merge completed with warnings"
+              
+              echo "✅ Results merged successfully"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '🔄 Merge Test Results'
+            continueOnError: true
+
+          # Step 6: Generate test metrics
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📈 Generating Test Metrics Dashboard"
+              echo "════════════════════════════════════════════════════════"
+              
+              cd $(Build.ArtifactStagingDirectory)/Final_Results
+              robotmetrics --inputpath . || echo "Metrics generated with warnings"
+              
+              echo "✅ Metrics dashboard created"
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📈 Generate Metrics Dashboard'
+            continueOnError: true
+
+          # Step 7: Create summary report
+          - script: |
+              echo "════════════════════════════════════════════════════════"
+              echo "📋 FINAL TEST SUMMARY"
+              echo "════════════════════════════════════════════════════════"
+              
+              cd $(Build.ArtifactStagingDirectory)/Final_Results
+              
+              if [ -f combined_output.xml ]; then
+                TOTAL_PASSED=$(grep -oP 'pass="\K[0-9]+' combined_output.xml | head -1 || echo "0")
+                TOTAL_FAILED=$(grep -oP 'fail="\K[0-9]+' combined_output.xml | head -1 || echo "0")
+                TOTAL=$((TOTAL_PASSED + TOTAL_FAILED))
+                
+                echo ""
+                echo "┌────────────────────────────────────────────────────┐"
+                echo "│          COMBINED TEST RESULTS                     │"
+                echo "├────────────────────────────────────────────────────┤"
+                echo "│  Total Tests:      $TOTAL"
+                echo "│  ✅ Passed:         $TOTAL_PASSED"
+                echo "│  ❌ Failed:         $TOTAL_FAILED"
+                echo "│  Pass Rate:        $(awk "BEGIN {if($TOTAL>0) printf \"%.1f%%\", ($TOTAL_PASSED/$TOTAL)*100; else print \"N/A\"}")"
+                echo "└────────────────────────────────────────────────────┘"
+                echo ""
+                
+                # Create markdown summary
+                cat > SUMMARY.md << EOF
+              # 🧪 Test Execution Summary
+              
+              **Build Number**: $(Build.BuildNumber)  
+              **Build ID**: $(Build.BuildId)  
+              **Date**: $(date)  
+              **Branch**: $(Build.SourceBranchName)
+              
+              ## 📊 Overall Results
+              
+              | Metric | Count |
+              |--------|-------|
+              | Total Tests | $TOTAL |
+              | ✅ Passed | $TOTAL_PASSED |
+              | ❌ Failed | $TOTAL_FAILED |
+              | Pass Rate | $(awk "BEGIN {if($TOTAL>0) printf \"%.1f%%\", ($TOTAL_PASSED/$TOTAL)*100; else print \"N/A\"}") |
+              
+              ## 📱 Mobile Tests
+              - Results: \`mobile_report.html\`
+              - Logs: \`mobile_log.html\`
+              - Screenshots: Available in artifacts
+              
+              ## 🌐 Web Tests
+              - Results: \`web_report.html\`
+              - Logs: \`web_log.html\`
+              - Screenshots: Available in artifacts
+              
+              ## 📊 Combined Report
+              - **Main Report**: \`combined_report.html\` ⭐
+              - **Metrics Dashboard**: \`metrics.html\` 📈
+              - **Test Logs**: \`combined_log.html\`
+              
+              ---
+              *All artifacts are available for download from Azure DevOps*
+              EOF
+                
+                cat SUMMARY.md
+              else
+                echo "⚠️  No combined results found"
+              fi
+              
+              echo "════════════════════════════════════════════════════════"
+            displayName: '📋 Create Summary Report'
+            condition: always()
+
+          # Step 8: Publish final consolidated artifacts
+          - task: PublishBuildArtifacts@1
+            displayName: '📦 Publish Final Combined Artifacts'
+            condition: always()
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)/Final_Results'
+              ArtifactName: '📊_FINAL_Combined_Results'
+              publishLocation: 'Container'
