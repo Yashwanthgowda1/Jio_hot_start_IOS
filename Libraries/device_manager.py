@@ -20,6 +20,7 @@ class DriverManger:
     @staticmethod
     # ex: pass deviec_1 :user_allaccess
     def initiate_driver(device):
+        # the device_1 or browser it will choice
         device_class = shared_utils.getconfig_device_class(device)
 
         if device_class == "browsers":
@@ -59,7 +60,9 @@ class DriverManger:
             chrome_options.add_argument(f"--log-file={_log_file}")
             print(f"{device}: Chromedriver logging to: {_log_file}")
 
-            driver = chrome_webdriver(options=chrome_options)
+            # `chrome_webdriver` is the `selenium.webdriver` module alias;
+            # instantiate the Chrome WebDriver via its `Chrome` class.
+            driver = chrome_webdriver.Chrome(options=chrome_options)
 
             # The parent directory of 'chromedriver.exe' will suffice for determining the chromedriver version:
             print(f"driver.service.path={driver.service.path}")
@@ -98,6 +101,7 @@ class DriverManger:
         _driver_store={
                     "device_1": <driver_adress>,
                     "device_2": <driver_adress>
+                    "browser": <driver>
         }
 
         '''
@@ -106,26 +110,7 @@ class DriverManger:
                 
 
 
-    #   this method is some extra work need to see as of now neglated the function of appium automatically lanuching          
-# def check_port_running_request_status(appium_process,appium_url, port):
-
-            # appium_path=f"C:\\Users\\C5403671\\AppData\\Roaming\\npm\\appium"
-            # appium_process = subprocess.Popen(
-            #     [appium_path, "-p", str(port)],
-            #     stdout=subprocess.PIPE,
-            #     stderr=subprocess.PIPE
-            # )
-
-#     for i in range(20):  # wait up to 10 seconds
-#         try:
-#             r = requests.get(f"http://127.0.0.1:{port}/wd/hub/status")
-#             if r.status_code == 200:
-#                 print(f"Appium server ready at {appium_url}")
-#                 return appium_process, appium_url
-#         except requests.exceptions.ConnectionError:
-#             pass
-#         time.sleep(0.5)
-
+            
 
 
 
@@ -149,6 +134,35 @@ def get_driver(device=None):
         return default_driver_present_single
     raise Exception("Multiple drivers exist; specify device name.")
 
+
+
+def lanuch_browser(device):
+    _device=[]
+    if isinstance(device, str):  # the value of the string or what it will check
+        _device=[device]
+        # using the multipal device in 
+    for device in _device:
+        DriverManger.initiate_driver(device)
+        try:
+            # Use explicit indexing since config is a dict loaded from JSON.
+            # This will raise KeyError for missing keys which we catch to provide
+            # a clear error message instead of silently proceeding with None.
+            lanuching_website = shared_utils.config["browsers"]["web_site"]
+        except KeyError:
+            raise RuntimeError("Browser launch URL not configured at config['browsers']['web_site']")
+
+        driver = DriverManger._driver_store.get(device)
+        if driver is None:
+            raise RuntimeError(f"No driver available for device '{device}' after initiate_driver")
+
+        try:
+            driver.get(lanuching_website)
+            print(f"the browser is launched by device={device}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to open URL '{lanuching_website}' on device={device}: {e}")
+        
+
+        
 
 
 @staticmethod

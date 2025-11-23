@@ -80,6 +80,7 @@ def collect_and_perform_the_device_status():
         print(f"{i}. {dev}")
         check_device_is_onine(dev)
 
+
 def launch_jio_hotstar_application(device):
     """
     Launches the Jio Hotstar (Disney + Hotstar) app on the given connected device

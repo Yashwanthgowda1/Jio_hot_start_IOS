@@ -13,6 +13,11 @@ Tc2: Select fav show from Tv options
     Sleep    10
     select fav show from Tv options
     [Teardown]    close all drivers
+
+TC3: lanuh web appliaction jio hotstar
+    [Tags]     45679
+    lanuh_web_appliaction
+    [Teardown]    close all drivers
     
 
     
