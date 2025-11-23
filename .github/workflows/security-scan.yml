@@ -1,4 +1,4 @@
-name: '🔒 Production Security Scan'
+name: 'Production Security Scan'
 
 # When to run this workflow
 on:

@@ -1,5 +1,7 @@
 from Libraries import shared_utils
 import time
+from Libraries import device_manager
+
 tv_shows_dict=shared_utils.load_loctors("Resource/page_object/tv_shows.json")
 
 
@@ -38,6 +40,7 @@ def swipe_page_to_get_fav_option(device, max_swipes=7):
 
 
 def swipe_fav_page_left_to_right(device, max_swipes=5):
+
     element=shared_utils.find_element(device, tv_shows_dict, "scroll_the_favriout_section_left_right")
     for attempt in range(max_swipes):
 
@@ -56,4 +59,7 @@ def swipe_fav_page_left_to_right(device, max_swipes=5):
 
     # If reached here → not found even after swiping
     raise Exception(f"Movie not found after {max_swipes} swipes")
+
+def launch_web_appliaction_verify_login_able_to_sigin_invalid_number(device):
+    device_manager.lanuch_browser(device)
 

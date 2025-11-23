@@ -57,7 +57,7 @@ def appium_endpoint_suffix(device):
     print(f"{device}: Appium version {version}, endpointSuffix={suffix}")
     return suffix
 
-
+# unused
 def decode_device_specifier(device):
     if not isinstance(device, str):
         raise AssertionError("Device specifier must be string")
@@ -76,7 +76,7 @@ def decode_device_specifier(device):
 
     return device_name, account_type
 
-
+# unused
 def get_configured_device_property(device, propname):
     device_name, _ = decode_device_specifier(device)
     device_class = getconfig_device_class(device_name)

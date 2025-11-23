@@ -96,24 +96,16 @@
         }
 	},
     "browsers": {
-        "tdc_1": {
-          "user": {
+        "web_site":"https://www.hotstar.com/in/home",
+        "device1user": {
             "username": "-",
             "password": "-",
             "displayname": "-",
-            "phonenumber": "-",
+            "phonenumber": "6363****75",
             "pstndisplay": "-",
             "extension": "-"
             },
-          "device1user": {
-            "username": "-",
-            "password": "-",
-            "displayname": "-",
-            "phonenumber": "-",
-            "pstndisplay": "-",
-            "extension": "-"
-            },
-          "device2user": {
+        "device2user":{
             "username": "-",
             "password": "-",
             "displayname": "-",
@@ -123,31 +115,6 @@
             "rtt_text_data":"welcome to automation"
           } 
         }
-      },
-    "adb_disabled_device": {
-        "udid": "-"
-    },
-    "meetings" : {
-        "name": "test_meeting",
-        "participant": "-",
-        "location": "-"
-    },
-    "Report_feedback" : {
-        "title": "-",
-        "bug_details": "-"
-    },
-    "hot_desk" : {
-        "invalid_username" : "-"
-    },
-    "set_status_message" : {
-        "message" : "-"
-    },
-    "user" : {
-        "invalid_username" : "-",
-        "invalid_domain" : "-",
-        "invalid_password" : "-"
-    },
-	"incorrect_number": {
-        "phonenumber": "11234567890"
-    }
 }
+      
+    
