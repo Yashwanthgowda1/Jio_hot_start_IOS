@@ -6,3 +6,6 @@ env/
 configs/
 configs.json
 .idea/
+chrome_logs/
+results/
+

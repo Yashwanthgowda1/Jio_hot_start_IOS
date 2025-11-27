@@ -126,7 +126,6 @@ def take_screenshot(driver, device_name, base_log_dir):
 
 @auto_handle_appium_errors()
 def find_element(device, locator_dict, locator_key, timeout=10, single_element=True):
-
     # Convert single device → list
     devices = [device] if isinstance(device, str) else device
 
@@ -149,7 +148,9 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
 
         if device_type == "devices":  # Appium
             by_map = {
+
                 "xpath": AppiumBy.XPATH,
+                "xpath1": AppiumBy.XPATH,
                 "id": AppiumBy.ACCESSIBILITY_ID,
                 "id2": AppiumBy.ID,
                 "class_name": AppiumBy.CLASS_NAME,
@@ -228,6 +229,20 @@ def swipe_up(device):
     else:                # Landscape
         driver.swipe(width/4, 4*(height/5), width/4, height/5)
 
+        
+def swipe_down(device):
+    driver = device_manager.get_existing_driver(device)
+    size = driver.get_window_size()
+    width, height = size["width"], size["height"]
+
+    if height > width:   # Portrait
+        # Swipe from top → bottom
+        driver.swipe(width/2, height/5, width/2, 4*(height/5))
+    else:                # Landscape
+        driver.swipe(width/4, height/5, width/4, 4*(height/5))
+
+
+
 def swipe_multiple(device, count=3):
     for _ in range(count):
         swipe_up(device)
@@ -288,6 +303,7 @@ def swipe_right(device):
 
 
 def swipe_left_to_right_fav_shows(device, element):
+    # it will help to swipe from right  to left
     driver = device_manager.get_existing_driver(device)
     size = element.size
     location = element.location

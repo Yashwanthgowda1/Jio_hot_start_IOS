@@ -18,6 +18,30 @@
   },
   "continue": {
     "xpath" : "//android.widget.Button[@content-desc='Continue']"
+  },
+  "web_home_page_suggetsion":{
+    "xpath":"//div[contains(@class,'gap-SPACE_08')]//*[contains(@class,'swiper-container')]"
+  },
+  "web_home_main_suggestion_swipping_content":{
+    "xpath":"//div[starts-with(@class,'swiper-slide') and @role='listitem']"
+  },
+  "web_swipe_diapper_the_adevrtisements":{
+    "xpath":"//DIV[@class='Yw0QEqs6MNqq6KIagcR-G']"
+  },
+  "web_main_info_container":{
+    "id": "shimmerContainer"
+
+  },
+  "more_option":{
+  "xpath":"//*[@content-desc='More']"
+  },
+  "more_option_dilouge_box_popups":{
+    "xpath":"//android.view.View[@resource-id='tag_landing_page_tray_space']"
+  
+  },
+  "studio_option":{
+    "xpath":"//*[@text='Studios']"
+    
   }
 
 }
