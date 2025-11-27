@@ -9,12 +9,12 @@ on:
       - "requirements.txt"
 
   schedule:
-    - cron: "0 2 * * *"  # Run daily at 2 AM UTC
+    - cron: "0 2 * * *"  # Daily at 2 AM UTC
 
 jobs:
 
   # ════════════════════════════════════════
-  # JOB 1: ANDROID TESTS (runs on macOS)
+  # JOB 1: ANDROID TESTS (macOS Emulator)
   # ════════════════════════════════════════
   android-tests:
     runs-on: macos-latest
@@ -45,7 +45,6 @@ jobs:
 
       - name: Setup Android SDK
         run: |
-          echo "Setting up Android SDK..."
           echo "y" | sudo $ANDROID_HOME/tools/bin/sdkmanager --licenses || true
           sdkmanager "platform-tools" \
                      "platforms;android-30" \
@@ -53,7 +52,7 @@ jobs:
                      "system-images;android-30;google_apis;x86_64" \
                      "emulator"
 
-      - name: Create AVD
+      - name: Create Android Emulator (Pixel 7 Pro)
         run: |
           echo "no" | avdmanager create avd \
             -n test_emulator \
@@ -67,7 +66,7 @@ jobs:
           adb wait-for-device
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
 
-      - name: Install Appium
+      - name: Install Appium 1.22.3
         run: |
           npm install -g appium@1.22.3
           appium driver install uiautomator2
@@ -75,9 +74,9 @@ jobs:
       - name: Start Appium Server
         run: |
           nohup appium --log-level info > appium.log 2>&1 &
-          sleep 5
+          sleep 6
 
-      - name: Run Android Tests
+      - name: Run Android Tests (All .robot files under Test/)
         run: |
           mkdir -p results/android
           robot \
@@ -88,7 +87,7 @@ jobs:
             --xunit android_xunit.xml \
             --variable PLATFORM:Android \
             --variable DEVICE_NAME:test_emulator \
-            tests/android/ || true
+            Test/ || true
 
       - name: Upload Android Test Results
         uses: actions/upload-artifact@v4
@@ -97,7 +96,7 @@ jobs:
           path: results/android
 
   # ════════════════════════════════════════
-  # JOB 2: WEB TESTS (runs on ubuntu)
+  # JOB 2: WEB TESTS (Ubuntu + Chrome)
   # ════════════════════════════════════════
   web-tests:
     runs-on: ubuntu-latest
@@ -112,17 +111,16 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Chrome
+      - name: Install Chrome Browser
         run: |
           wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Get Chrome Major Version
+      - name: Detect Chrome Major Version
         run: echo "CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1')" >> $GITHUB_ENV
 
       - name: Install ChromeDriver
         run: |
-          echo "Detected Chrome version: $CHROME_VERSION"
           DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION})
           wget https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
@@ -144,7 +142,7 @@ jobs:
           export DISPLAY=:99
           Xvfb :99 -screen 0 1920x1080x24 &
 
-      - name: Run Web Tests
+      - name: Run Web Tests (All .robot files under Test/)
         run: |
           export DISPLAY=:99
           mkdir -p results/web
@@ -154,9 +152,9 @@ jobs:
             --log web_log.html \
             --report web_report.html \
             --xunit web_xunit.xml \
-            --variable BROWSER:headlesschrome \
             --variable PLATFORM:Web \
-            tests/web/ || true
+            --variable BROWSER:headlesschrome \
+            Test/ || true
 
       - name: Upload Web Test Results
         uses: actions/upload-artifact@v4
@@ -165,7 +163,7 @@ jobs:
           path: results/web
 
   # ════════════════════════════════════════
-  # JOB 3: MERGE REPORTS
+  # JOB 3: MERGE REPORTS (Android + Web)
   # ════════════════════════════════════════
   merge-reports:
     runs-on: ubuntu-latest
@@ -184,11 +182,11 @@ jobs:
           name: web-test-results
           path: merged/web
 
-      - name: Install Robot Framework
+      - name: Install Robot Framework Tools
         run: |
           pip install robotframework robotframework-metrics
 
-      - name: Merge XML Reports
+      - name: Merge Test Reports
         run: |
           mkdir -p merged/combined
           rebot \
@@ -198,7 +196,7 @@ jobs:
             merged/android/*_output.xml \
             merged/web/*_output.xml || true
 
-      - name: Upload Combined Report
+      - name: Upload Final Combined Report
         uses: actions/upload-artifact@v4
         with:
           name: combined-report
