@@ -122,6 +122,7 @@ jobs:
       - name: '📋 Create Summary'
         if: always()
         run: |
+        
           echo "# 🔒 Security Scan Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## What was checked:" >> $GITHUB_STEP_SUMMARY
