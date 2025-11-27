@@ -16,6 +16,7 @@ Launch And Signin Verify Home Page
 select fav show from Tv options
     verify_and_click_on_tv_show_menu_in_homepage    device=device_1
     verify_tv_show_page_opened    device=device_1
+    swipe_page_to_get_fav_option    device=device_1
     swipe_fav_page_left_to_right    device=device_1
 
 close all drivers

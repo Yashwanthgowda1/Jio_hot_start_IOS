@@ -13,18 +13,24 @@
         "id2":"Family Shows"
     },
     "select_the_show_favritos":{
-        "xpath":"//android.view.View[contains(@resource-id,'Kids Shows']"
+        "xpath":"//android.widget.TextView[@resource-id='tag_label_regular_tray_title' and @text='Popular Shows']"
+
     },
     "scroll_the_favriout_section_left_right":{
-        "xpath": "//android.view.View[@resource-id='tag_box_masthead_tray']",
-        "android_ui_automator":"new UiSelector().resourceId('tag_content_regular_tray').instance(3)"
+
+        "xpath":"(//android.view.View[@resource-id='tag_content_regular_tray'])[3]",
+        "android_ui_automator":"new UiSelector().resourceId('tag_content_regular_tray').instance(2)"
 
     },
     "select_home_drame_required_movie_click":{
         "xpath": "//android.view.View[@resource-id='tag_box_masthead_tray']"
+    },
+    "studio_page_options":{
+        "xpath":"//*[@resource-id='tag_image_content_poster_parent']//*[contains(@content-desc,'CHANNEL')]",
+        "xpath1":"//android.view.View[@resource-id='tag_image_content_poster' and contains(@content-desc,'CHANNEL')]"
 
+    }
 
     }
 
 
-}
