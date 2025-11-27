@@ -1,4 +1,4 @@
-name: "CodeQL"
+name: "CodeQL to check the code quality"
 
 on:
   push:
@@ -15,10 +15,7 @@ jobs:
     permissions:
       actions: read
       security-events: write
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript', 'python', 'go' ]
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,7 +23,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: ${{ matrix.language }}
+          languages: auto
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v2
