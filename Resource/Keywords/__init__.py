@@ -10,6 +10,7 @@ project root is added to `sys.path` or Robot is invoked with `--pythonpath`.
 We add a safe, idempotent insertion of the project root to `sys.path` so
 keyword modules can import the `Libraries` package reliably.
 """
+
 import sys
 from pathlib import Path
 
@@ -20,8 +21,7 @@ _PROJECT_ROOT = _THIS_DIR.parent.parent
 _PROJECT_ROOT_STR = str(_PROJECT_ROOT)
 
 if _PROJECT_ROOT_STR not in sys.path:
-	# Insert at position 0 so it takes precedence over installed packages
-	sys.path.insert(0, _PROJECT_ROOT_STR)
+    # Insert at position 0 so it takes precedence over installed packages
+    sys.path.insert(0, _PROJECT_ROOT_STR)
 
 __all__ = []
-

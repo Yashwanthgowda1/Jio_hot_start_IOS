@@ -11,8 +11,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import (
-    NoSuchElementException, StaleElementReferenceException,
-    ElementNotInteractableException, ElementNotVisibleException
+    NoSuchElementException,
+    StaleElementReferenceException,
+    ElementNotInteractableException,
+    ElementNotVisibleException,
 )
 from Libraries import device_manager
 from Libraries.error_handler_utils import auto_handle_appium_errors, for_each_device
@@ -20,10 +22,12 @@ from Libraries.error_handler_utils import auto_handle_appium_errors, for_each_de
 
 # ---------------- CONFIG ---------------- #
 
+
 def _init_config(file_name: str):
     """Load config.json"""
     with open(file_name, "r") as f:
         return json.load(f)
+
 
 file_path = "config.json"
 config = _init_config(file_path)
@@ -44,6 +48,7 @@ def getconfig_device_class(device_name):
 
 # ---------------- HELPERS ---------------- #
 
+
 def sleep_with_msg(device, wait_seconds, why_message):
     msg = f"{device}: " if device else ""
     print(f"{msg}Sleeping {wait_seconds}s: {why_message}")
@@ -56,6 +61,7 @@ def appium_endpoint_suffix(device):
     suffix = "" if major >= 2 else "/wd/hub"
     print(f"{device}: Appium version {version}, endpointSuffix={suffix}")
     return suffix
+
 
 # unused
 def decode_device_specifier(device):
@@ -75,6 +81,7 @@ def decode_device_specifier(device):
         raise ValueError(f"{device_name} has no account type {account_type}")
 
     return device_name, account_type
+
 
 # unused
 def get_configured_device_property(device, propname):
@@ -100,12 +107,13 @@ def get_top_level_device_port(device):
 
     return port
 
+
 def take_screenshot(driver, device_name, base_log_dir):
     timestamp = time.strftime("%Y%m%d_%H%M%S")
 
     # Root folder (your custom directory)
     directory_name = "screenshots"
-    root_dir = os.path.join("./reports",directory_name, device_name)
+    root_dir = os.path.join("./reports", directory_name, device_name)
 
     # Create root directory if missing
     os.makedirs(root_dir, exist_ok=True)
@@ -122,7 +130,9 @@ def take_screenshot(driver, device_name, base_log_dir):
 
     return file_path
 
+
 # ---------------- LOCATOR METHODS ---------------- #
+
 
 @auto_handle_appium_errors()
 def find_element(device, locator_dict, locator_key, timeout=10, single_element=True):
@@ -148,20 +158,15 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
 
         if device_type == "devices":  # Appium
             by_map = {
-
                 "xpath": AppiumBy.XPATH,
                 "xpath1": AppiumBy.XPATH,
                 "id": AppiumBy.ACCESSIBILITY_ID,
                 "id2": AppiumBy.ID,
                 "class_name": AppiumBy.CLASS_NAME,
-                "android_ui_automator": AppiumBy.ANDROID_UIAUTOMATOR
+                "android_ui_automator": AppiumBy.ANDROID_UIAUTOMATOR,
             }
         else:  # Browser
-            by_map = {
-                "id": By.ID,
-                "xpath": By.XPATH,
-                "text": By.LINK_TEXT
-            }
+            by_map = {"id": By.ID, "xpath": By.XPATH, "text": By.LINK_TEXT}
 
         locators = locator_dict[locator_key]
 
@@ -194,7 +199,9 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
 
 
 def find_elements(devices, locator_dict, locator_key, timeout=10):
-    return find_element(devices, locator_dict, locator_key, timeout, single_element=False)
+    return find_element(
+        devices, locator_dict, locator_key, timeout, single_element=False
+    )
 
 
 def load_loctors(file_path):
@@ -224,28 +231,28 @@ def swipe_up(device):
     size = driver.get_window_size()
     width, height = size["width"], size["height"]
 
-    if height > width:   # Portrait
-        driver.swipe(width/2, 4*(height/5), width/2, height/5)
-    else:                # Landscape
-        driver.swipe(width/4, 4*(height/5), width/4, height/5)
+    if height > width:  # Portrait
+        driver.swipe(width / 2, 4 * (height / 5), width / 2, height / 5)
+    else:  # Landscape
+        driver.swipe(width / 4, 4 * (height / 5), width / 4, height / 5)
 
-        
+
 def swipe_down(device):
     driver = device_manager.get_existing_driver(device)
     size = driver.get_window_size()
     width, height = size["width"], size["height"]
 
-    if height > width:   # Portrait
+    if height > width:  # Portrait
         # Swipe from top → bottom
-        driver.swipe(width/2, height/5, width/2, 4*(height/5))
-    else:                # Landscape
-        driver.swipe(width/4, height/5, width/4, 4*(height/5))
-
+        driver.swipe(width / 2, height / 5, width / 2, 4 * (height / 5))
+    else:  # Landscape
+        driver.swipe(width / 4, height / 5, width / 4, 4 * (height / 5))
 
 
 def swipe_multiple(device, count=3):
     for _ in range(count):
         swipe_up(device)
+
 
 def swipe_till_end(device):
     driver = device_manager.get_existing_driver(device)
@@ -275,31 +282,34 @@ def swipe_till_end(device):
             print(f"{device}: Reached end of page.")
             break
 
+
 def swipe_left(device):
-        driver = device_manager.get_existing_driver(device)
-        size = device.get_window_size()
+    driver = device_manager.get_existing_driver(device)
+    size = device.get_window_size()
 
-        start_x = int(size['width'] * 0.8)   # right side
-        end_x   = int(size['width'] * 0.2)   # left side
-        y       = int(size['height'] * 0.5)  # middle
+    start_x = int(size["width"] * 0.8)  # right side
+    end_x = int(size["width"] * 0.2)  # left side
+    y = int(size["height"] * 0.5)  # middle
 
-        actions = TouchAction(driver)
-        actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
+    actions = TouchAction(driver)
+    actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
+
 
 def swipe_left_multiple(device, count=3):
     for _ in range(count):
         swipe_left(device)
 
+
 def swipe_right(device):
-        driver = device_manager.get_existing_driver(device)
-        size = device.get_window_size()
+    driver = device_manager.get_existing_driver(device)
+    size = device.get_window_size()
 
-        start_x = int(size['width'] * 0.2)   # left side
-        end_x   = int(size['width'] * 0.8)   # right side
-        y       = int(size['height'] * 0.5)  # middle
+    start_x = int(size["width"] * 0.2)  # left side
+    end_x = int(size["width"] * 0.8)  # right side
+    y = int(size["height"] * 0.5)  # middle
 
-        actions = TouchAction(driver)
-        actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
+    actions = TouchAction(driver)
+    actions.press(x=start_x, y=y).wait(ms=300).move_to(x=end_x, y=y).release().perform()
 
 
 def swipe_left_to_right_fav_shows(device, element):
@@ -307,9 +317,39 @@ def swipe_left_to_right_fav_shows(device, element):
     driver = device_manager.get_existing_driver(device)
     size = element.size
     location = element.location
-    start_x = location['x'] + size['width'] * 0.8
-    end_x   = location['x'] + size['width'] * 0.2
-    y = location['y'] + size['height'] / 2
+    start_x = location["x"] + size["width"] * 0.8
+    end_x = location["x"] + size["width"] * 0.2
+    y = location["y"] + size["height"] / 2
     driver.swipe(start_x, y, end_x, y, 800)
 
-        
+
+def get_dict_copy_locater(
+    device, loacter_dict, loacter_key, existing_value, replace_value
+):
+    _new_parent_copy = dict()
+    _new_child_dict = {}
+    for child_dict_key in loacter_dict[loacter_key]:
+        if not child_dict_key.lower() in [
+            "xpath",
+            "id",
+            "id1",
+            "xpath1",
+            "android_ui_automator",
+        ]:
+            # ignore unknown keys
+            continue
+        if not existing_value in loacter_dict[loacter_key][child_dict_key]:
+            # In case we want to fix these:
+            # print(f"*WARN* Problematic dictionary passed to get_dict_copy(),'{parent_dict_key}'['{child_dict_key}'] has no '{replace_token}' token.")
+            continue
+    _new_child_dict[child_dict_key] = loacter_dict[loacter_key][child_dict_key].replace(
+        existing_value, replace_value
+    )
+
+    if len(_new_child_dict) == 0:
+        raise AssertionError(
+            f"Dictionary '{loacter_key}' has no valid selectors containing '{replace_token}'"
+        )
+
+    _new_parent_copy[loacter_key] = _new_child_dict
+    return _new_parent_copy

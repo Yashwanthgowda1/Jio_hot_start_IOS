@@ -2,48 +2,68 @@ from Libraries import shared_utils
 import time
 from Libraries import device_manager
 
-tv_shows_dict=shared_utils.load_loctors("Resource/page_object/tv_shows.json")
+tv_shows_dict = shared_utils.load_loctors("Resource/page_object/tv_shows.json")
 home_page_dict = shared_utils.load_loctors("Resource\page_object\Home_page.json")
-
 
 
 def verify_and_click_on_tv_show_menu_in_homepage(device):
     try:
-        
-        all_favorites_short_cut_section=shared_utils.find_element(device, tv_shows_dict,"main_tv_shows_menu_home_page")
-        if all_favorites_short_cut_section and all_favorites_short_cut_section.is_displayed():
-            element = shared_utils.find_element(device, tv_shows_dict, "tv_shows_first_item")
+
+        all_favorites_short_cut_section = shared_utils.find_element(
+            device, tv_shows_dict, "main_tv_shows_menu_home_page"
+        )
+        if (
+            all_favorites_short_cut_section
+            and all_favorites_short_cut_section.is_displayed()
+        ):
+            element = shared_utils.find_element(
+                device, tv_shows_dict, "tv_shows_first_item"
+            )
             element.click()
             shared_utils.sleep_with_msg(device, 2, "Clicked TV Show menu")
     except Exception as e:
         raise Exception(f"[{device}] Error clicking TV Show menu: {e}")
 
+
 def verify_tv_show_page_opened(device):
     shared_utils.swipe_up(device)
-    shared_utils.sleep_with_msg(device, 2, "Swiped up to verify TV Show page so the load the wrong button")
-    element_visible = shared_utils.find_element(device, tv_shows_dict, "clsoe_filter_button")
+    shared_utils.sleep_with_msg(
+        device, 2, "Swiped up to verify TV Show page so the load the wrong button"
+    )
+    element_visible = shared_utils.find_element(
+        device, tv_shows_dict, "clsoe_filter_button"
+    )
     if element_visible and element_visible.is_displayed():
         print("TV Show page is opened successfully.")
         shared_utils.swipe_down(device)
     else:
         raise Exception("TV Show page did not open as expected.")
 
+
 def swipe_page_to_get_fav_option(device, max_swipes=10):
     for attempt in range(max_swipes):
-        element = shared_utils.find_element(device, tv_shows_dict, "select_the_show_favritos")
+        element = shared_utils.find_element(
+            device, tv_shows_dict, "select_the_show_favritos"
+        )
         if element and element.is_displayed():
             print("Successfully found the favorite option.")
             time.sleep(3)
             return  # Return the visible element
         shared_utils.swipe_up(device)
-        shared_utils.sleep_with_msg(device, 2, f"Swipe {attempt+1} to get favorite option")
+        shared_utils.sleep_with_msg(
+            device, 2, f"Swipe {attempt+1} to get favorite option"
+        )
 
-    raise Exception("Favorite option not found even after swiping {} times".format(max_swipes))
+    raise Exception(
+        "Favorite option not found even after swiping {} times".format(max_swipes)
+    )
 
 
 def swipe_fav_page_left_to_right(device, max_swipes=5):
 
-    element=shared_utils.find_element(device, tv_shows_dict, "scroll_the_favriout_section_left_right")
+    element = shared_utils.find_element(
+        device, tv_shows_dict, "scroll_the_favriout_section_left_right"
+    )
     for attempt in range(max_swipes):
 
         # Try to find the movie after each swipe
@@ -65,26 +85,90 @@ def launch_web_appliaction_verify_login_able_to_sigin_invalid_number(device):
 
 
 def verfy_user_able_to_select_studio_option(device) -> list:
-    all_favorites_short_cut_section=shared_utils.find_element(device, tv_shows_dict,"main_tv_shows_menu_home_page")
-    if all_favorites_short_cut_section and all_favorites_short_cut_section.is_displayed():
-            more_option=shared_utils.find_element(device, home_page_dict, "more_option")
-            more_option.click()
-            el_info_page=shared_utils.find_element(device, home_page_dict, "more_option_dilouge_box_popups")
-            if el_info_page and el_info_page.is_displayed():
-                shared_utils.find_element(device, home_page_dict, "studio_option").click()
-                el_studi=shared_utils.find_element(device, home_page_dict, "studio_option")
-                if el_studi and el_studi.is_displayed():
-                    shared_utils.sleep_with_msg(device, 2, f"waiting to load the {el_studi}")
-                    list_all_options=shared_utils.find_elements(device, tv_shows_dict, "studio_page_options")
-                    el_ments=[]
-                    for all_options_one_by in list_all_options:
-                            each_starting_elemnt=all_options_one_by.get_attribute("content-desc")
-                            el_ments.append(each_starting_elemnt.split(',')[0])
-                    return  el_ments
+    all_favorites_short_cut_section = shared_utils.find_element(
+        device, tv_shows_dict, "main_tv_shows_menu_home_page"
+    )
+    if (
+        all_favorites_short_cut_section
+        and all_favorites_short_cut_section.is_displayed()
+    ):
+        more_option = shared_utils.find_element(device, home_page_dict, "more_option")
+        more_option.click()
+        el_info_page = shared_utils.find_element(
+            device, home_page_dict, "more_option_dilouge_box_popups"
+        )
+        if el_info_page and el_info_page.is_displayed():
+            shared_utils.find_element(device, home_page_dict, "studio_option").click()
+            el_studi = shared_utils.find_element(
+                device, home_page_dict, "studio_option"
+            )
+            if el_studi and el_studi.is_displayed():
+                shared_utils.sleep_with_msg(
+                    device, 2, f"waiting to load the {el_studi}"
+                )
+                list_all_options = shared_utils.find_elements(
+                    device, tv_shows_dict, "studio_page_options"
+                )
+                el_ments = []
+                for all_options_one_by in list_all_options:
+                    each_starting_elemnt = all_options_one_by.get_attribute(
+                        "content-desc"
+                    )
+                    el_ments.append(each_starting_elemnt.split(",")[0])
+                return el_ments
 
 
+def click_selected_content_page_on_studio(device, content_choose="HBO"):
+    if content_choose.lower() not in [
+        "specials",
+        "disney plus",
+        "hbo",
+        "peacock",
+        "paramount",
+    ]:
+        raise AssertionError(f" the {content_choose} option is not present in studio")
+    dict_choose = {}
+    for opt in ["Specials", "Disney Plus", "HBO", "Peacock", "Paramount"]:
+        dict_choose[opt.lower()] = opt
+    temp_locater = shared_utils.get_dict_copy_locater(
+        device,
+        tv_shows_dict,
+        "studio_page_options",
+        "CHANNEL",
+        dict_choose[content_choose.lower()],
+    )
+    shared_utils.find_element(device, temp_locater, "studio_page_options").click()
 
 
+def select_top_trading_movies_list_and_verify_able_to_see_indiffrent_languages(device):
+    top_tranding_movies = shared_utils.find_element(
+        device, home_page_dict, "top_tranding_movies_today"
+    )
+    for i in range(5):
+        shared_utils.swipe_up(device)
+        top_tranding_movies = shared_utils.find_element(
+            device, home_page_dict, "top_tranding_movies_today"
+        )
+        if top_tranding_movies and top_tranding_movies.is_displayed():
+            top_tranding_movies.click()
+            print("The top trending movies are displayed")
+            return
 
-            
 
+def verify_top_trending_diffrent_language(device):
+    list_languages = shared_utils.find_elements(
+        device, home_page_dict, "get_all_language_trending_movies"
+    )
+    _list_of_all_languages = []
+    for list_languages_one_by in list_languages:
+        list_languages_one_by.click()
+        is_slected = shared_utils.find_element(
+            device, tv_shows_dict, "selected_top_movies"
+        )
+        language = list_languages_one_by.get_attribute("resource-id").split("_")[-1:]
+        if is_slected.get_attribute("content-desc") != "SELECTED":
+            raise AssertionError(f"{language} is not selected")
+        _list_of_all_languages.append(
+            (list_languages_one_by.get_attribute("resource-id")).split("_")[-1:]
+        )
+    print(f"the list of all index: {_list_of_all_languages}")
