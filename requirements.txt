@@ -26,7 +26,7 @@ Appium-Python-Client==2.11.1
 
 # API Testing
 robotframework-requests==0.9.5
-requests==2.31.0
+requests==2.32.4
 
 # Database Testing
 robotframework-databaselibrary==1.2.4
