@@ -10,21 +10,21 @@ Launch Application
     [Teardown]    close all drivers
 
 Tc2: Select fav show from Tv options
-    [Tags]    56789
+    [Tags]    56789    @SANITY
     Launch And Signin Verify Home Page
     Sleep    10
     select fav show from Tv options
     [Teardown]    close all drivers
 
 TC3: lanuh web appliaction jio hotstar
-    [Tags]     45679
+    [Tags]     45679     
     lanuh_web_appliaction
     Sleep    10s
     [Teardown]    close all drivers
 
 
 TC4: verfy all avilable options in studio
-    [Tags]    45678
+    [Tags]    45678     @SOMKE    @SANITY
     Launch And Signin Verify Home Page
     @{list_of_all_pages_in_studio}=        verfy_user_able_to_select_studio_option    device=device_1
     ${count}=    Get Length    ${list_of_all_pages_in_studio}
@@ -33,9 +33,16 @@ TC4: verfy all avilable options in studio
     ELSE
         Fail    Studio features missing! Only found ${count}
     END
+    click_selected_content_page_on_studio    device=device_1
     [Teardown]    close all drivers
 
 
+TC5: verify top treanding movies today
+    [Tags]   45709   @SMOKE   @SANITY
+    Launch And Signin Verify Home Page
+    select_top_trading_movies_list_and_verify_able_to_see_indiffrent_languages    device=device_1
+    verify_top_trending_diffrent_language        device=device_1
+    [Teardown]    close all drivers
 
     
 

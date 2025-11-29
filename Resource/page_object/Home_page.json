@@ -42,6 +42,25 @@
   "studio_option":{
     "xpath":"//*[@text='Studios']"
     
+  },
+  "home_page_location_enable_popups_window":{
+    "id":"tag_honey_pot_sheet",
+    "android_ui_automator" : "new UiSelector().resourceId('tag_honey_pot_sheet')",
+    "xpath":"//android.widget.ScrollView[@resource-id='tag_honey_pot_sheet']"
+  },
+  "allow_access":{
+    "id":"Allow Access"
+  },
+  "permission_dialog_info":{
+    "xpath":"//android.widget.LinearLayout[@resource-id='com.android.permissioncontroller:id/grant_dialog']"
+  },
+  "only_this_time":{
+    "xpath":"//*[@text='Only this time']"
+  },
+"top_tranding_movies_today":{
+  "xpath":"//android.widget.TextView[@text='Top 10 in India Today' and  @resource-id='tag_label_regular_tray_title']"
+},
+"get_all_language_trending_movies":{
+  "xpath":"//android.view.View[contains(@resource-id,'TAG_TAB_BAR_TAB_LABEL')]"
   }
-
 }

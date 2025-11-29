@@ -5,7 +5,7 @@ from appium.webdriver.common.appiumby import AppiumBy
 from selenium.common.exceptions import (
     InvalidSessionIdException,
     NoSuchElementException,
-    ElementNotVisibleException
+    ElementNotVisibleException,
 )
 
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 # ---------------- UNIVERSAL DECORATORS ---------------- #
+
 
 def auto_handle_appium_errors(retry_count=3, retry_delay=3):
     """
@@ -37,12 +38,16 @@ def auto_handle_appium_errors(retry_count=3, retry_delay=3):
                     time.sleep(retry_delay)
 
                 except NoSuchElementException:
-                    print(f"[{device}] ⚠ Element not found. Retrying ({attempt}/{retry_count})...")
+                    print(
+                        f"[{device}] ⚠ Element not found. Retrying ({attempt}/{retry_count})..."
+                    )
                     time.sleep(retry_delay)
 
                 except AttributeError as ae:
                     if "'NoneType' object has no attribute" in str(ae):
-                        print(f"[{device}] ⚠ Element not ready yet. Retrying ({attempt}/{retry_count})...")
+                        print(
+                            f"[{device}] ⚠ Element not ready yet. Retrying ({attempt}/{retry_count})..."
+                        )
                         time.sleep(retry_delay)
                     else:
                         raise
@@ -51,10 +56,13 @@ def auto_handle_appium_errors(retry_count=3, retry_delay=3):
                     print(f"[{device}] ❌ Unexpected error in {func.__name__}: {e}")
                     break
 
-            print(f"[{device}] ❌ Failed after {retry_count} retries in {func.__name__}")
+            print(
+                f"[{device}] ❌ Failed after {retry_count} retries in {func.__name__}"
+            )
             return None
 
         return wrapper
+
     return decorator
 
 
@@ -62,6 +70,7 @@ def for_each_device(func):
     """
     Runs a function independently for each device.
     """
+
     @wraps(func)
     def wrapper(devices, *args, **kwargs):
         if isinstance(devices, str):
@@ -71,10 +80,12 @@ def for_each_device(func):
             result = func(device, *args, **kwargs)
             results.append(result)
         return results
+
     return wrapper
 
 
 from Libraries.device_manager import DriverManger, tear_down_driver
+
 
 def restart_driver(device_id):
     print(f"[{device_id}] Restarting driver session...")

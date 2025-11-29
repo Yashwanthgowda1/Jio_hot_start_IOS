@@ -29,6 +29,9 @@
         "xpath":"//*[@resource-id='tag_image_content_poster_parent']//*[contains(@content-desc,'CHANNEL')]",
         "xpath1":"//android.view.View[@resource-id='tag_image_content_poster' and contains(@content-desc,'CHANNEL')]"
 
+    },
+    "selected_top_movies":{
+        "xpath":"//android.view.View[@content-desc='SELECTED']"
     }
 
     }
