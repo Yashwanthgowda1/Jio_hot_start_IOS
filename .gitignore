@@ -8,4 +8,5 @@ configs.json
 .idea/
 chrome_logs/
 results/
+Test/payments.py
 
