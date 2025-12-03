@@ -322,33 +322,27 @@ def swipe_left_to_right_fav_shows(device, element):
     y = location["y"] + size["height"] / 2
     driver.swipe(start_x, y, end_x, y, 800)
 
-
-def get_dict_copy_locater(
-    device, loacter_dict, loacter_key, existing_value, replace_value
-):
-    _new_parent_copy = dict()
+def get_dict_copy_locater(device, loacter_dict, loacter_key, existing_value, replace_value):
+    _new_parent_copy = {}
     _new_child_dict = {}
-    for child_dict_key in loacter_dict[loacter_key]:
-        if not child_dict_key.lower() in [
-            "xpath",
-            "id",
-            "id1",
-            "xpath1",
-            "android_ui_automator",
-        ]:
-            # ignore unknown keys
-            continue
-        if not existing_value in loacter_dict[loacter_key][child_dict_key]:
-            # In case we want to fix these:
-            # print(f"*WARN* Problematic dictionary passed to get_dict_copy(),'{parent_dict_key}'['{child_dict_key}'] has no '{replace_token}' token.")
-            continue
-    _new_child_dict[child_dict_key] = loacter_dict[loacter_key][child_dict_key].replace(
-        existing_value, replace_value
-    )
 
+    for child_dict_key in loacter_dict[loacter_key]:
+
+        # Only process known locator keys
+        if child_dict_key.lower() not in ["xpath", "id", "id1", "xpath1", "android_ui_automator"]:
+            continue
+
+        child_value = loacter_dict[loacter_key][child_dict_key]
+
+        # Check if value contains the word to replace
+        if existing_value in child_value:
+            # Perform replacement
+            _new_child_dict[child_dict_key] = child_value.replace(existing_value, replace_value)
+
+    # If nothing was replaced, raise error
     if len(_new_child_dict) == 0:
         raise AssertionError(
-            f"Dictionary '{loacter_key}' has no valid selectors containing '{replace_token}'"
+            f"Dictionary '{loacter_key}' has no valid selectors containing '{existing_value}'"
         )
 
     _new_parent_copy[loacter_key] = _new_child_dict

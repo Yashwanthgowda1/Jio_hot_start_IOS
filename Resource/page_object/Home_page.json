@@ -62,5 +62,12 @@
 },
 "get_all_language_trending_movies":{
   "xpath":"//android.view.View[contains(@resource-id,'TAG_TAB_BAR_TAB_LABEL')]"
+  },
+  "web_scroll_main_trending_page" : {
+    "xpath":"//div[contains(@class,'swiper-slide swiper-slide-')]",
+    "xpath1":"//*[@id='page-container']/div/div[3]/div[3]/div/div/div[3]/div/div/div[2]/div[2]/div/div/div[1]"
+  },
+  "web_number_sliding_happens":{
+    "xpath":"//div[@class='swiper-wrapper']"
   }
 }
