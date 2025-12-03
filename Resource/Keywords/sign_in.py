@@ -9,7 +9,6 @@ home_page_dict = shared_utils.load_loctors("Resource\page_object\Home_page.json"
 
 
 class sign_in:
-
     def clear_cache_before_launch(func):
         def wrapper(self, device, *args, **kwargs):
             device_control.clear_cache_the_app(device)

@@ -12,20 +12,26 @@ def swipe_the_elemnt_main_suggestion_left_and_verify(device):
     """
     driver = device_manager.get_existing_driver(device)
     if driver is None:
-        raise RuntimeError(f"No driver found for device '{device}'. Did you call initiate_driver(device) first?")
+        raise RuntimeError(
+            f"No driver found for device '{device}'. Did you call initiate_driver(device) first?"
+        )
 
     try:
         # Scroll the page (works for web drivers)
         driver.execute_script("window.scrollBy(100,350)")
 
         # Verify suggestion section exists
-        elemnts = shared_utils.find_element(device, home_page_dict, "web_home_page_suggetsion")
+        elemnts = shared_utils.find_element(
+            device, home_page_dict, "web_home_page_suggetsion"
+        )
         if not (elemnts and elemnts.is_displayed()):
-            raise Exception(f"{device}: web_home_page_suggetsion not found or not visible")
+            raise Exception(
+                f"{device}: web_home_page_suggetsion not found or not visible"
+            )
 
         # Get list of sliding items and iterate
         shared_utils.sleep_with_msg(device, 5, "waiting for load the scroll page")
-    
+
         # for _ in range(1):
         #     elemnst_last_active = shared_utils.find_element(device, home_page_dict, "web_scroll_main_trending_page")
         #     print(f"the text i need to evrify which one pick first {elemnst_last_active.text}")
@@ -39,6 +45,3 @@ def swipe_the_elemnt_main_suggestion_left_and_verify(device):
 
     except Exception as e:
         raise AssertionError(f"{device}: element check failed: {e}")
-
-    
-    

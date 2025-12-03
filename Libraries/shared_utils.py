@@ -140,7 +140,6 @@ def find_element(device, locator_dict, locator_key, timeout=10, single_element=T
     devices = [device] if isinstance(device, str) else device
 
     for dev in devices:
-
         # --------------------------------------
         # 1️⃣ Ensure driver exists
         # --------------------------------------
@@ -322,14 +321,22 @@ def swipe_left_to_right_fav_shows(device, element):
     y = location["y"] + size["height"] / 2
     driver.swipe(start_x, y, end_x, y, 800)
 
-def get_dict_copy_locater(device, loacter_dict, loacter_key, existing_value, replace_value):
+
+def get_dict_copy_locater(
+    device, loacter_dict, loacter_key, existing_value, replace_value
+):
     _new_parent_copy = {}
     _new_child_dict = {}
 
     for child_dict_key in loacter_dict[loacter_key]:
-
         # Only process known locator keys
-        if child_dict_key.lower() not in ["xpath", "id", "id1", "xpath1", "android_ui_automator"]:
+        if child_dict_key.lower() not in [
+            "xpath",
+            "id",
+            "id1",
+            "xpath1",
+            "android_ui_automator",
+        ]:
             continue
 
         child_value = loacter_dict[loacter_key][child_dict_key]
@@ -337,7 +344,9 @@ def get_dict_copy_locater(device, loacter_dict, loacter_key, existing_value, rep
         # Check if value contains the word to replace
         if existing_value in child_value:
             # Perform replacement
-            _new_child_dict[child_dict_key] = child_value.replace(existing_value, replace_value)
+            _new_child_dict[child_dict_key] = child_value.replace(
+                existing_value, replace_value
+            )
 
     # If nothing was replaced, raise error
     if len(_new_child_dict) == 0:
