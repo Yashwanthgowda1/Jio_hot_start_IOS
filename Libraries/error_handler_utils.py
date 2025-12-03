@@ -26,7 +26,6 @@ def auto_handle_appium_errors(retry_count=3, retry_delay=3):
     def decorator(func):
         @wraps(func)
         def wrapper(device, *args, **kwargs):
-
             for attempt in range(1, retry_count + 1):
                 try:
                     return func(device, *args, **kwargs)
@@ -56,9 +55,7 @@ def auto_handle_appium_errors(retry_count=3, retry_delay=3):
                     print(f"[{device}] ❌ Unexpected error in {func.__name__}: {e}")
                     break
 
-            print(
-                f"[{device}] ❌ Failed after {retry_count} retries in {func.__name__}"
-            )
+            print(f"[{device}] ❌ Failed after {retry_count} retries in {func.__name__}")
             return None
 
         return wrapper

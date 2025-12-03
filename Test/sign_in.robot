@@ -46,7 +46,10 @@ TC5: verify top treanding movies today
 
     
 
-    
-
+TC6: lanuh web appliaction jio hotstar
+    [Tags]    78789   
+    lanuh_web_appliaction
+    swipe_the_elemnt_main_suggestion_left_and_verify    device=device1user
+    [Teardown]    close all drivers
 
 
