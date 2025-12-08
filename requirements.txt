@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿# Appium-Python-Client==2.11.1
 # robotframework==7.3.2
 # robotframework-pythonlibcore==4.4.1
@@ -51,57 +50,3 @@ robotframework-retryfailed==0.2.0
 python-dateutil==2.8.2
 
 
-=======
-# Appium-Python-Client==2.11.1
-# robotframework==7.3.2
-# robotframework-pythonlibcore==4.4.1
-# robotframework-seleniumlibrary==6.7.1
-# selenium==4.34.2
-
-
-# # robot --pythonpath c:\python_study\Jio_hot_start_IOS Resource\Keywords\Home_page.robot
-
-
-# #  robot --pythonpath c:\python_study\Jio_hot_start_IOS -d results/store -i 56788 Resource\Keywords\Home_page.robot
-
-
-
-# Robot Framework Core
-robotframework==7.3.2
-robotframework-pythonlibcore==4.4.1
-
-# Web Testing
-robotframework-seleniumlibrary==6.7.1
-selenium==4.34.2
-
-# Mobile / Android Testing
-robotframework-appiumlibrary==2.0.0
-Appium-Python-Client==2.11.1
-
-# API Testing
-robotframework-requests==0.9.5
-requests==2.31.0
-
-# Database Testing
-robotframework-databaselibrary==1.2.4
-
-
-# Additional Libraries
-Pillow==10.3.0
-black==25.11.0
-
-# WebDriver Manager (optional, not used in GitHub actions)
-webdriver-manager==4.0.1
-
-# Reporting & Metrics
-robotframework-metrics==3.3.3
-robotframework-xunit==1.0.0
-
-# Retry Failed Tests
-robotframework-retryfailed==0.2.0
-
-# Utilities
-python-dateutil==2.8.2
-
-
->>>>>>> e339c4d7211610c3bac8a3250737450b380d59b8

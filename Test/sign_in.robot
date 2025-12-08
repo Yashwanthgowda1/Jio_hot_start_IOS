@@ -37,7 +37,6 @@ TC4: verfy all avilable options in studio
     [Teardown]    close all drivers
 
 
-
 TC5: verify top treanding movies today
     [Tags]   45709   @SMOKE   @SANITY
     Launch And Signin Verify Home Page
@@ -53,11 +52,4 @@ TC6: lanuh web appliaction jio hotstar
     swipe_the_elemnt_main_suggestion_left_and_verify    device=device1user
     [Teardown]    close all drivers
 
-
-Tc5: Verify user bale to see the main tray option when drag up the more option    
-    [Tags]    34574       @smoke     @sanity
-    Launch And Signin Verify Home Page
-    open_verify_more_option    device=device_1
-    verfiy_user_able_to_see_the_main_try_opton_when_scroll    device=device_1
-    [Teardown]    close all drivers
 

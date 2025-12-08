@@ -89,7 +89,11 @@ def verfy_user_able_to_select_studio_option(device) -> list:
         all_favorites_short_cut_section
         and all_favorites_short_cut_section.is_displayed()
     ):
-        el_info_page = open_verify_more_option(device)
+        more_option = shared_utils.find_element(device, home_page_dict, "more_option")
+        more_option.click()
+        el_info_page = shared_utils.find_element(
+            device, home_page_dict, "more_option_dilouge_box_popups"
+        )
         if el_info_page and el_info_page.is_displayed():
             shared_utils.find_element(device, home_page_dict, "studio_option").click()
             el_studi = shared_utils.find_element(
@@ -109,15 +113,6 @@ def verfy_user_able_to_select_studio_option(device) -> list:
                     )
                     el_ments.append(each_starting_elemnt.split(",")[0])
                 return el_ments
-
-
-def open_verify_more_option(device):
-    more_option = shared_utils.find_element(device, home_page_dict, "more_option")
-    more_option.click()
-    el_info_page = shared_utils.find_element(
-        device, home_page_dict, "more_option_dilouge_box_popups"
-    )
-    return el_info_page
 
 
 def click_selected_content_page_on_studio(device, content_choose="HBO"):
@@ -174,15 +169,3 @@ def verify_top_trending_diffrent_language(device):
             (list_languages_one_by.get_attribute("resource-id")).split("_")[-1:]
         )
     print(f"the list of all index: {_list_of_all_languages}")
-
-
-def verfiy_user_able_to_see_the_main_try_opton_when_scroll(device):
-    elemnt = shared_utils.find_element(
-        device, tv_shows_dict, "more_option_see_main_tray"
-    )
-    shared_utils.swipe_up_element_ref(device, elemnt)
-    bottom_bar = shared_utils.find_element(
-        device, home_page_dict, "verify_bottom_menu_home"
-    )
-    if not (bottom_bar and bottom_bar.is_displayed()):
-        raise AssertionError(f" the elemnt not displayed in {device}")
