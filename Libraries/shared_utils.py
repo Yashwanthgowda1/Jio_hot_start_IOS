@@ -231,7 +231,7 @@ def swipe_up(device):
     width, height = size["width"], size["height"]
 
     if height > width:  # Portrait
-        driver.swipe(width / 2, 4 * (height / 5), width / 2, height / 5)
+        driver.swipe(width / 2, height * 0.8, width / 2, height / 5)
     else:  # Landscape
         driver.swipe(width / 4, 4 * (height / 5), width / 4, height / 5)
 
@@ -283,6 +283,7 @@ def swipe_till_end(device):
 
 
 def swipe_left(device):
+    # left to right side
     driver = device_manager.get_existing_driver(device)
     size = device.get_window_size()
 
@@ -320,6 +321,19 @@ def swipe_left_to_right_fav_shows(device, element):
     end_x = location["x"] + size["width"] * 0.2
     y = location["y"] + size["height"] / 2
     driver.swipe(start_x, y, end_x, y, 800)
+
+
+def swipe_up_element_ref(device, element):
+    driver = device_manager.get_existing_driver(device)
+    loc = element.location
+    size = element.size
+
+    start_x = loc["x"] + size["width"] / 2
+    start_y = loc["y"] + size["height"] * 0.8
+    end_x = start_x
+    end_y = loc["y"] + size["height"] * 0.2
+
+    driver.swipe(start_x, start_y, end_x, end_y, 500)
 
 
 def get_dict_copy_locater(

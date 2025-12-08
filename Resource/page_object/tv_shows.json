@@ -32,6 +32,9 @@
     },
     "selected_top_movies":{
         "xpath":"//android.view.View[@content-desc='SELECTED']"
+    },
+    "more_option_see_main_tray":{
+        "xpath": "//android.view.View[@resource-id='tag_space_tray']"
     }
 
     }
