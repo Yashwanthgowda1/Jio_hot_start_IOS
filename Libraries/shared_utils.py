@@ -3,6 +3,9 @@ import time
 import subprocess
 import os
 from appium.webdriver.common.touch_action import TouchAction
+from selenium.webdriver.common.action_chains import ActionChains
+
+
 
 
 from robot.api import logger
@@ -321,6 +324,18 @@ def swipe_left_to_right_fav_shows(device, element):
     y = location["y"] + size["height"] / 2
     driver.swipe(start_x, y, end_x, y, 800)
 
+def swipe_up_element_ref(device, element):
+    driver = device_manager.get_existing_driver(device)
+    loc = element.location
+    size = element.size
+
+    start_x = loc['x'] + size['width'] / 2
+    start_y = loc['y'] + size['height'] * 0.8
+    end_x   = start_x
+    end_y   = loc['y'] + size['height'] * 0.2
+
+    driver.swipe(start_x, start_y, end_x, end_y, 500)
+
 
 def get_dict_copy_locater(
     device, loacter_dict, loacter_key, existing_value, replace_value
@@ -356,3 +371,32 @@ def get_dict_copy_locater(
 
     _new_parent_copy[loacter_key] = _new_child_dict
     return _new_parent_copy
+
+def get_action_chain_object(device, type_of_device="browser", perform="Drag_and_drop", src=None, dest=None):
+    ''''
+    This method will help to perform the action like drag and drop , right click , double click and move to element and here src menas elmenet 
+    which one we need to perform the action and dest means where we need to drop the element'''
+
+    if perform.lower()  not in ["drag_and_drop", "right_click", "double_click", "mouse_hover"]:
+        raise AssertionError(f"{perform} action is not supported")
+    driver=device_manager.get_existing_driver(device)
+    if perform.lower()=="drag_and_drop" and src is not None and dest is not None:
+        action=ActionChains(driver)
+        action.drag_and_drop(src, dest).perform()
+        
+    elif perform.lower()=="right_click" and src is not None:
+        action=ActionChains(driver)
+        action.context_click(src).perform()
+    elif perform.lower()=="double_click"  and src is not None:
+        action=ActionChains(driver)
+        action.double_click(src).perform()
+    elif perform.lower()=="mouse_hover"  and src is not None:
+        action=ActionChains(driver)
+        action.move_to_element(src).perform()
+
+
+    
+
+
+
+    

@@ -1,8 +1,7 @@
 *** Settings ***
 Library    sign_in.py
 Library    tv_shows_page.py
-Library    ../../Jio_hot_start_IOS/Libraries/device_manager.py
-Library    ../../Jio_hot_start_IOS/Libraries/shared_utils.py
+Library    web_homepage.py
 
 
 *** Keywords ***

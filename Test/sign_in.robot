@@ -45,7 +45,6 @@ TC5: verify top treanding movies today
     [Teardown]    close all drivers
 
     
-
 TC6: lanuh web appliaction jio hotstar
     [Tags]    78789   
     lanuh_web_appliaction
@@ -53,3 +52,10 @@ TC6: lanuh web appliaction jio hotstar
     [Teardown]    close all drivers
 
 
+TC7: verify user able to click watch now button in web tv shows page able to click run the video at 2x and video will play that speed and able tap times and running the video play 
+    [Tags]    90987    @SMOKE
+    lanuh_web_appliaction
+    swipe_the_elemnt_main_suggestion_left_and_verify    device=device1user
+    verify_user_able_to_click_watch_now_button_in_web_tv_shows_page    device=device1user
+    [Teardown]     
+    

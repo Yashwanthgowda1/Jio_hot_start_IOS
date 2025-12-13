@@ -45,3 +45,28 @@ def swipe_the_elemnt_main_suggestion_left_and_verify(device):
 
     except Exception as e:
         raise AssertionError(f"{device}: element check failed: {e}")
+
+
+
+def verify_user_able_to_click_watch_now_button_in_web_tv_shows_page(device):
+    driver=device_manager.get_existing_driver(device)
+    before_click=driver.current_url
+    shared_utils.find_element(device, "tv_shows_dict","web_tv_shows_main_watch_now_button")
+    if before_click==driver.current_url:
+        raise AssertionError(f"{device}: User is able to click watch now button in web tv shows page")
+    elemnt_of_ads=shared_utils.find_element(device, "tv_shows_dict","verify_adds_section_in_tv_shows_page")
+    temp=elemnt_of_ads
+    if (elemnt_of_ads and elemnt_of_ads.is_displayed()):
+        shared_utils.sleep_with_msg(device,5,"Ads section is displayed in tv shows page")
+        if temp.is_displayed():
+            shared_utils.sleep_with_msg(device,5,"Ads section is displayed in tv shows page")
+    src=shared_utils.find_element(device, "tv_shows_dict","double_click_the_page_toaper_the_vieo_line")        
+    shared_utils.get_action_chain_object(device,perform="double_click", src=src)
+    shared_utils.sleep_with_msg(device,5,"Double clicked the video line to apear the")
+    shared_utils.find_element(device, "tv_shows_dict","web_tv_shows_main_watch_now_button").click()
+    current_time=shared_utils.find_element(device,"tv_shows_dict", "current_time_before_skipping").text
+    skipp_farword=shared_utils.find_element(device, "tv_shows_dict", "skipp_backwards_button")
+    shared_utils.get_action_chain_object(device,perform="double_click", src=skipp_farword)
+    after_clicking_skipping=shared_utils.find_element(device, "tv_shows_dict", "current_time_before_skipping").text
+    if current_time==after_clicking_skipping:
+        raise AssertionError(f"{device}: User is not able to skip the video by clicking skip button")
