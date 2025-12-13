@@ -32,8 +32,14 @@
     },
     "selected_top_movies":{
         "xpath":"//android.view.View[@content-desc='SELECTED']"
-    }
+    },
+    "web_tv_shows_main_watch_now_button":{
+        "xpath":"//button[@aria-label='Subscribe to Watch']"
+    },
+    "verify_adds_section_in_tv_shows_page":{
+        "xpath":"//span[@class=' ON_IMAGE LABEL_CAPTION1_SEMIBOLD ']"
 
+    }
     }
 
 
